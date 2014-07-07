@@ -1,0 +1,31 @@
+{
+  "name": "mix",
+  "description": "Streaming build system",
+  "version": "1.0.0",
+  "author": {
+    "name": "Ole André Vadla Ravnås",
+    "email": "ole.andre.ravnas@soundrop.com",
+    "url": "http://www.soundrop.fm/"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/soundrop/mix"
+  },
+  "dependencies": {
+    "body-parser": "1.4.3",
+    "connect": "3.0.1",
+    "connect-livereload": "0.4.0",
+    "esprima": "1.2.2",
+    "kefir": "^0.1.12",
+    "mime": "1.2.11",
+    "morgan": "1.1.1",
+    "parseurl": "1.0.1",
+    "tiny-lr": "0.0.8",
+    "vinyl-fs": "0.3.4"
+  },
+  "engines": {
+    "node": ">= 0.10"
+  },
+  "homepage": "https://github.com/expressjs/mix"
+}
