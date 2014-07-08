@@ -59,7 +59,8 @@ Files.prototype._onEvent = function (event) {
 
 Files.prototype._fileToNode = function (file) {
     return {
-        name: '/' + path.relative(this._base, file.path),
+        name: path.relative(this._base, file.path),
+        base: this._base,
         data: file.contents,
         mode: file.stat.mode
     };

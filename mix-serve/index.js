@@ -51,7 +51,7 @@ Serve.prototype._onRequest = function (req, res, next) {
         }
         for (var i = 0; i !== this._tree.nodes.length; i++) {
             var node = this._tree.nodes[i];
-            if (node.name === pathname) {
+            if ('/' + node.name === pathname) {
                 var data = node.data;
                 res.writeHead(200, {
                     'Content-Length': data.length,
