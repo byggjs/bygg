@@ -1,18 +1,10 @@
 var Kefir = require('kefir');
-var Mix = require('mix');
-var Tree = Mix.Tree;
+var mix = require('mix');
 var path = require('path');
 var vfs = require('vinyl-fs');
 
-module.exports = function (base, globs) {
-    return new Files(base, globs);
-};
-
-Files.prototype = Object.create(Mix.prototype);
-Files.prototype.constructor = Files;
-
-function Files(options) {
-    Mix.call(this);
+module.exports = function (options) {
+    var base = path.resolve(options.base);
 
     var globs;
     if (typeof options.globs === 'string') {
@@ -20,48 +12,36 @@ function Files(options) {
     } else {
         globs = options.globs;
     }
-    this._base = path.resolve(options.base);
-    this._globs = globs.map(function (g) { return path.join(this._base, g) }, this);
-    this._watching = false;
+    globs = globs.map(function (g) { return path.join(base, g) });
 
-    this.source = Kefir.fromBinder(function (callback) {
-        this._push = callback;
-    }, this);
-
-    this._events = new Kefir.bus();
-    this._events.onNewValue(this._onEvent, this);
-
-    this._pushNext = this._pushNext.bind(this);
-    this._pushNext();
-}
-
-Files.prototype._pushNext = function () {
-    var stream = vfs.src(this._globs, {
-        base: this._base
-    });
-    var files = [];
-    stream.on('data', function (file) {
-        files.push(file);
-    });
-    stream.on('end', function () {
-        var tree = new Tree(files.map(this._fileToNode, this), this._events);
-
-        this._push(tree);
-    }.bind(this));
-};
-
-Files.prototype._onEvent = function (event) {
-    if (event.name === 'stream-updates' && !this._watching) {
-        this._watching = true;
-        vfs.watch(this._globs, {}, this._pushNext);
+    function readTree(callback) {
+        var stream = vfs.src(globs, {
+            base: base
+        });
+        var files = [];
+        stream.on('data', function (file) {
+            files.push(file);
+        });
+        stream.on('end', function () {
+            callback(new mix.Tree(files.map(fileToNode)));
+        }.bind(this));
     }
-};
 
-Files.prototype._fileToNode = function (file) {
-    return {
-        name: path.relative(this._base, file.path),
-        base: this._base,
-        data: file.contents,
-        mode: file.stat.mode
-    };
-}
+    function fileToNode(file) {
+        return {
+            name: path.relative(base, file.path),
+            base: base,
+            data: file.contents,
+            mode: file.stat.mode
+        };
+    }
+
+    return new mix.Stream(Kefir.fromBinder(function (sink) {
+        vfs.watch(globs, {}, pushNext);
+        pushNext();
+
+        function pushNext() {
+            readTree(sink);
+        }
+    }));
+};

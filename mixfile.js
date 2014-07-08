@@ -1,4 +1,4 @@
-var Mix = require('mix');
+var mix = require('mix');
 var browserify = require('mix-browserify');
 var files = require('mix-files');
 var minify = require('mix-minify');
@@ -7,9 +7,9 @@ var serve = require('mix-serve');
 var stats = require('mix-stats');
 var write = require('mix-write');
 
-var mix = new Mix();
-mix.add(files({ base: 'src', globs: 'index.html' }));
-mix.add(files({ base: 'src', globs: 'scripts/app.js' }).pipe(browserify()).pipe(minify()));
-mix.add(files({ base: 'src', globs: 'styles/*.css' }).pipe(minify()));
-mix.pipe(rev()).tee(stats().pipe(write('build/')), serve(3000));
-// mix.pipe(rev()).pipe(stats()).pipe(write('build/'));
+var html = files({ base: 'src', globs: 'index.html' });
+var scripts = files({ base: 'src', globs: 'scripts/app.js' }).pipe(browserify()).pipe(minify());
+var styles = files({ base: 'src', globs: 'styles/*.css' }).pipe(minify());
+var build = mix.combine(html, scripts, styles).pipe(rev()).pipe(stats());
+build.pipe(write('build/'));
+build.pipe(serve(3000));

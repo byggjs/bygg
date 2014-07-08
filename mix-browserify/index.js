@@ -1,67 +1,22 @@
 var Kefir = require('kefir');
-var esprima = require('esprima');
-var Mix = require('mix');
-var Tree = Mix.Tree;
+var browserify = require('browserify');
 var dummy = require('./lib/transforms/dummy');
-var requireDependencies = require('./lib/transforms/require-dependencies');
+var minIn = require('mout/object/mixIn');
+var mix = require('mix');
 
-module.exports = function () {
-    return new Browserify();
-};
+module.exports = function (options) {
+    var b = null;
 
-Browserify.prototype = Object.create(Mix.prototype);
-Browserify.prototype.constructor = Browserify;
+    return function (tree) {
+        var node = tree.nodes[0];
 
-function Browserify(options) {
-    options = options || {};
+        if (b === null) {
+            b = browserify(mixIn({}, options, { basedir: node.base }));
+            b.add(node.name);
+            console.log('b:', b);
+        }
 
-    Mix.call(this);
-
-    var transforms = (options.transforms || []).concat([dummy, requireDependencies]);
-
-    this.sink = new Kefir.bus();
-
-    var stream = this.sink.map(this._treeToModule);
-    stream = transforms.reduce(function (s, transform) {
-        return s.flatMap(function (value) {
-            return transform.call(this, value);
-        }.bind(this));
-    }.bind(this), stream);
-
-    stream.log();
-
-    this.source = stream.map(this._moduleToTree);
-    this.source.log();
-}
-
-Browserify.prototype._treeToModule = function (tree) {
-    if (tree.nodes.length > 1) {
-        throw new Error('Only one file may be specified for browserification');
-    }
-
-    var node = tree.nodes[0];
-    var ast = esprima.parse(node.data);
-
-    return {
-        filename: node.name,
-        ast: ast
+        // TODO
+        return tree;
     };
-};
-
-Browserify.prototype._moduleToTree = function (program) {
-    console.log('_moduleToTree:', program);
-    return new Tree([]);
-};
-
-Browserify.prototype._require = function (path) {
-    return Kefir.fromBinder(function (sink) {
-        console.log('hola');
-        process.nextTick(function () {
-            console.log('end:', path);
-            sink('foo:' + path);
-            process.nextTick(function () {
-                sink(Kefir.END);
-            });
-        });
-    });
 };

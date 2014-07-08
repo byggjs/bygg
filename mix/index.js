@@ -1,6 +1,14 @@
-var Mix = require('./lib/mix');
+var Kefir = require('kefir');
+var Stream = require('./lib/stream');
+var Tree = require('./lib/tree');
 
-Object.defineProperty(Mix, 'Transform', { value: require('./lib/transform') });
-Object.defineProperty(Mix, 'Tree', { value: require('./lib/tree') });
+function combine() {
+    var observables = Array.prototype.map.call(arguments, function (stream) { return stream._observable; });
+    return new Stream(Kefir.combine(observables, Tree.merge));
+}
 
-module.exports = Mix;
+module.exports = {
+    combine: combine,
+    Stream: Stream,
+    Tree: Tree
+};

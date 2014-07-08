@@ -13,14 +13,13 @@
     "url": "git://github.com/soundrop/mix"
   },
   "dependencies": {
-    "body-parser": "1.4.3",
-    "connect": "3.0.1",
+    "browserify": "^4.2.0",
     "connect-livereload": "0.4.0",
-    "esprima": "1.2.2",
-    "estraverse": "^1.5.1",
-    "kefir": "^0.1.12",
+    "express": "4.5.1",
+    "kefir": "0.1.12",
     "mime": "1.2.11",
     "morgan": "1.1.1",
+    "mout": "0.9.1",
     "parseurl": "1.0.1",
     "tiny-lr": "0.0.8",
     "vinyl-fs": "0.3.4"
