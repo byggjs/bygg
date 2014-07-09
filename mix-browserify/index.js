@@ -11,6 +11,7 @@ module.exports = function (options) {
     var currentSink = null;
     var pkgCache = {};
     var depCache = {};
+    var firstPush = true;
 
     return function (tree) {
         if (tree.nodes.length !== 1) {
@@ -31,53 +32,70 @@ module.exports = function (options) {
             var b = browserify(mixIn({}, options, { basedir: node.base }));
 
             b.on('package', function (file, pkg) {
-                console.log('package:', file);
                 pkgCache[file] = pkg;
             });
             b.on('dep', function (dep) {
-                console.log('dep:', dep.id);
                 depCache[dep.id] = dep;
-                console.log('>>>');
                 watcher.add(dep.id);
-                console.log('<<<');
-                console.log('');
             });
             b.on('file', function (file) {
-                console.log('C file:', file);
+                watcher.add(file);
             });
             b.on('bundle', function (bundle) {
-                // console.log('D bundle:', bundle);
                 bundle.on('transform', function (transform, mfile) {
-                    // console.log('E transform:', transform.constructor, mfile);
                     transform.on('file', function (file) {
-                        // console.log('F file:', file);
+                        // TODO: handle file change
                     });
                 });
             });
 
             watcher.on('change', function (files) {
-                console.log('change!', files);
+                files.forEach(function (path) {
+                    delete depCache[path];
+                    watcher.remove(path);
+                });
+                pushBundle();
             });
 
             b.add(path.join(node.base, node.name));
 
-            var buffers = [];
-            var totalLength = 0;
-            var output = b.bundle();
-            output.on('data', function (buffer) {
-                buffers.push(buffer);
-                totalLength += buffer.length;
-            });
-            output.on('end', function () {
-                var outputTree = new mix.Tree([
-                    mixIn({}, node, { data: Buffer.concat(buffers, totalLength) })
-                ]);
-                sink.push(outputTree);
-            });
+            pushBundle();
+
+            function pushBundle() {
+                var buffers = [];
+                var totalLength = 0;
+                var bundleOptions = {
+                    includePackage: true,
+                    packageCache: pkgCache
+                };
+                if (!firstPush) {
+                    bundleOptions.cache = depCache;
+                }
+                var start = new Date();
+                var output = b.bundle(bundleOptions);
+                output.on('data', function (buffer) {
+                    buffers.push(buffer);
+                    totalLength += buffer.length;
+                });
+                output.on('error', function () {
+                    // TODO: handle
+                });
+                output.on('end', function () {
+                    if (watcher === null) {
+                        return;
+                    }
+
+                    var outputTree = new mix.Tree([
+                        mixIn({}, node, { data: Buffer.concat(buffers, totalLength) })
+                    ]);
+                    sink.push(outputTree);
+                    console.log('generated bundle in ' + (new Date() - start) + ' ms');
+                });
+            }
 
             return function dispose() {
-                console.log('dispose!');
                 watcher.dispose();
+                watcher = null;
             };
         });
     };
@@ -91,7 +109,7 @@ var Watcher = prime({
 
         Kefir.fromBinder(function (sink) {
             this._sink = sink;
-            return function () {
+            return function dispose() {
                 if (watcher !== null) {
                     watcher.close();
                     watcher = null;
@@ -107,7 +125,9 @@ var Watcher = prime({
                 delete files[path];
             }
             return files;
-        }).throttle(100).onValue(function (files) {
+        }).flatMap(debounce(600)).skipDuplicates(function (previous, next) {
+            return filesToString(previous) === filesToString(next);
+        }).onValue(function (files) {
             if (eventSink !== null) {
                 eventSink(Kefir.END);
             }
@@ -123,7 +143,6 @@ var Watcher = prime({
                     eventSink(['+', path]);
                 });
             }).scan({}, function (changed, update) {
-                console.log('scan:', update);
                 var operation = update[0];
                 var path = update[1];
                 if (operation === '+') {
@@ -132,8 +151,7 @@ var Watcher = prime({
                     delete changed[path];
                 }
                 return changed;
-            }).throttle(100).onValue(function (changed) {
-                console.log('process', changed);
+            }).flatMap(debounce(10, 600)).onValue(function (changed) {
                 var files = Object.keys(changed);
                 if (files.length > 0) {
                     files.forEach(function (path) {
@@ -143,6 +161,10 @@ var Watcher = prime({
                 }
             }, this);
         }, this);
+
+        function filesToString(files) {
+            return Object.keys(files).sort().join(':');
+        }
     },
     dispose: function () {
         this._sink(Kefir.END);
@@ -154,3 +176,52 @@ var Watcher = prime({
         this._sink(['-', path]);
     }
 });
+
+function debounce(wait, maxWait) {
+    var firstValueAt = null;
+    var pendingSink = null;
+
+    maxWait = maxWait || wait;
+
+    return function (value) {
+        if (pendingSink !== null) {
+            pendingSink(Kefir.END);
+            pendingSink = null;
+        }
+
+        if (firstValueAt === null) {
+            firstValueAt = new Date();
+        }
+
+        return Kefir.fromBinder(function (sink) {
+            var timer;
+
+            pendingSink = sink;
+
+            var now = new Date();
+            var elapsed = now - firstValueAt;
+            if (elapsed >= maxWait) {
+                pushValue();
+            } else {
+                var delay = Math.min(wait, maxWait - elapsed);
+                timer = setTimeout(pushValue, delay);
+            }
+
+            function pushValue() {
+                timer = null;
+                sink(value);
+                sink(Kefir.END);
+            }
+
+            return function dispose() {
+                firstValueAt = null;
+                pendingSink = null;
+
+                if (timer !== null) {
+                    clearTimeout(timer);
+                    timer = null;
+                }
+            };
+        });
+    };
+}
