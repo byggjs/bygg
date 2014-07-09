@@ -18,6 +18,7 @@ module.exports = function (options) {
             throw new Error('Exactly one file must be specified for browserification');
         }
         var node = tree.nodes[0];
+        var entrypoint = path.join(node.base, node.name);
 
         if (currentSink !== null) {
             currentSink.close();
@@ -28,6 +29,7 @@ module.exports = function (options) {
             currentSink = sink;
 
             var watcher = new Watcher();
+            var disposed = false;
 
             var b = browserify(mixIn({}, options, { basedir: node.base }));
 
@@ -36,10 +38,14 @@ module.exports = function (options) {
             });
             b.on('dep', function (dep) {
                 depCache[dep.id] = dep;
-                watcher.add(dep.id);
+                if (dep.id !== entrypoint) {
+                    watcher.add(dep.id);
+                }
             });
             b.on('file', function (file) {
-                watcher.add(file);
+                if (file !== entrypoint) {
+                    watcher.add(file);
+                }
             });
             b.on('bundle', function (bundle) {
                 bundle.on('transform', function (transform, mfile) {
@@ -50,6 +56,10 @@ module.exports = function (options) {
             });
 
             watcher.on('change', function (files) {
+                if (disposed) {
+                    return;
+                }
+
                 files.forEach(function (path) {
                     delete depCache[path];
                     watcher.remove(path);
@@ -57,7 +67,7 @@ module.exports = function (options) {
                 pushBundle();
             });
 
-            b.add(path.join(node.base, node.name));
+            b.add(entrypoint);
 
             pushBundle();
 
@@ -81,7 +91,7 @@ module.exports = function (options) {
                     // TODO: handle
                 });
                 output.on('end', function () {
-                    if (watcher === null) {
+                    if (disposed) {
                         return;
                     }
 
@@ -96,6 +106,8 @@ module.exports = function (options) {
             return function dispose() {
                 watcher.dispose();
                 watcher = null;
+
+                disposed = true;
             };
         });
     };
