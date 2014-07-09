@@ -7,11 +7,22 @@ var mix = require('mix');
 var mixIn = require('mout/object/mixIn');
 var path = require('path');
 
-module.exports = function (options) {
+module.exports = function (target, options) {
     var currentSink = null;
     var pkgCache = {};
     var depCache = {};
     var firstPush = true;
+
+    if (typeof target === 'object') {
+        options = target;
+        target = null;
+    } else {
+        target = target || null;
+        options = options || {};
+    }
+
+    var configure = options.configure || function () {};
+    delete options.configure;
 
     return function (tree) {
         if (tree.nodes.length !== 1) {
@@ -32,6 +43,8 @@ module.exports = function (options) {
             var disposed = false;
 
             var b = browserify(mixIn({}, options, { basedir: node.base }));
+
+            configure(b);
 
             b.on('package', function (file, pkg) {
                 pkgCache[file] = pkg;
@@ -96,7 +109,10 @@ module.exports = function (options) {
                     }
 
                     var outputTree = new mix.Tree([
-                        mixIn({}, node, { data: Buffer.concat(buffers, totalLength) })
+                        mixIn({}, node, {
+                            name: target || node.name,
+                            data: Buffer.concat(buffers, totalLength)
+                        })
                     ]);
                     sink.push(outputTree);
                     console.log('generated bundle in ' + (new Date() - start) + ' ms');
