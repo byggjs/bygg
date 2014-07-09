@@ -1,4 +1,3 @@
-var Kefir = require('kefir');
 var mix = require('mix');
 var path = require('path');
 var vfs = require('vinyl-fs');
@@ -36,12 +35,12 @@ module.exports = function (options) {
         };
     }
 
-    return new mix.Stream(Kefir.fromBinder(function (sink) {
+    return new mix.Stream(function (sink) {
         vfs.watch(globs, {}, pushNext);
         pushNext();
 
         function pushNext() {
-            readTree(sink);
+            readTree(sink.push);
         }
-    }));
+    });
 };

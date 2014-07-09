@@ -1,6 +1,6 @@
 module.exports = function () {
-    // TODO: implement
     return function (tree) {
+        // TODO: implement
         return tree;
     };
 };
