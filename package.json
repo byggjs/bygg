@@ -13,22 +13,27 @@
     "url": "git://github.com/soundrop/mix"
   },
   "dependencies": {
-    "browserify": "^4.2.0",
-    "chokidar": "^0.8.2",
+    "browserify": "4.2.0",
+    "chokidar": "0.8.2",
     "connect-livereload": "0.4.0",
     "express": "4.5.1",
-    "fsevents": "^0.2.0",
+    "fsevents": "0.2.0",
     "kefir": "0.1.12",
     "mime": "1.2.11",
     "morgan": "1.1.1",
     "mout": "0.9.1",
     "parseurl": "1.0.1",
-    "prime": "^0.4.2",
+    "prime": "0.4.2",
     "tiny-lr": "0.0.8",
     "vinyl-fs": "0.3.4"
   },
   "engines": {
     "node": ">= 0.10"
   },
-  "homepage": "https://github.com/expressjs/mix"
+  "homepage": "https://github.com/expressjs/mix",
+  "devDependencies": {
+    "envify": "1.2.1",
+    "react": "0.10.0",
+    "reactify": "0.13.1"
+  }
 }
