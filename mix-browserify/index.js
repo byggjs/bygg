@@ -31,6 +31,8 @@ module.exports = function (target, options) {
         var node = tree.nodes[0];
         var entrypoint = path.join(node.base, node.name);
 
+        delete depCache[entrypoint];
+
         if (currentSink !== null) {
             currentSink.close();
             currentSink = null;
@@ -108,6 +110,8 @@ module.exports = function (target, options) {
                         return;
                     }
 
+                    firstPush = false;
+
                     var outputTree = new mix.Tree([
                         mixIn({}, node, {
                             name: target || node.name,
@@ -115,6 +119,7 @@ module.exports = function (target, options) {
                         })
                     ]);
                     sink.push(outputTree);
+
                     console.log('generated bundle in ' + (new Date() - start) + ' ms');
                 });
             }
