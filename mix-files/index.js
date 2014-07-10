@@ -13,19 +13,6 @@ module.exports = function (options) {
     }
     globs = globs.map(function (g) { return path.join(base, g) });
 
-    function readTree(callback) {
-        var stream = vfs.src(globs, {
-            base: base
-        });
-        var files = [];
-        stream.on('data', function (file) {
-            files.push(file);
-        });
-        stream.on('end', function () {
-            callback(new mix.Tree(files.map(fileToNode)));
-        }.bind(this));
-    }
-
     function fileToNode(file) {
         return {
             name: path.relative(base, file.path),
@@ -36,11 +23,31 @@ module.exports = function (options) {
     }
 
     return new mix.Stream(function (sink) {
-        vfs.watch(globs, {}, pushNext);
+        var watcher = new mix.Watcher();
+        watcher.on('change', pushNext);
+
         pushNext();
 
         function pushNext() {
             readTree(sink.push);
         }
+
+        function readTree(callback) {
+            var stream = vfs.src(globs, {
+                base: base
+            });
+            var files = [];
+            stream.on('data', function (file) {
+                watcher.add(file.path);
+                files.push(file);
+            });
+            stream.on('end', function () {
+                callback(new mix.Tree(files.map(fileToNode)));
+            }.bind(this));
+        }
+
+        return function dispose() {
+            watcher.dispose();
+        };
     });
 };
