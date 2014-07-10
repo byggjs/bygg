@@ -1,11 +1,12 @@
 var browserify = require('mix-browserify');
 var files = require('mix-files');
-var minify = require('mix-minify');
+var minifyCss = require('mix-minify-css');
 var mix = require('mix');
 var rev = require('mix-rev');
 var sass = require('mix-sass');
 var serve = require('mix-serve');
 var stats = require('mix-stats');
+var uglify = require('mix-uglify');
 var write = require('mix-write');
 
 var html = files({ base: 'src', globs: 'index.html' });
@@ -17,8 +18,8 @@ var scripts = files({ base: 'src', globs: 'scripts/app.jsx' })
             b.require('../node_modules/react/react.js', {expose: 'react'});
         }
     }))
-    .pipe(minify());
-var styles = files({ base: 'src', globs: 'styles/app.scss' }).pipe(sass()).pipe(minify());
+    .pipe(uglify());
+var styles = files({ base: 'src', globs: 'styles/app.scss' }).pipe(sass()).pipe(minifyCss());
 var build = mix.combine(html, scripts, styles).pipe(rev()).pipe(stats());
 build.pipe(write('build/'));
 build.pipe(serve(3000));
