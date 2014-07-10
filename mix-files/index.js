@@ -13,12 +13,12 @@ module.exports = function (options) {
     }
     globs = globs.map(function (g) { return path.join(base, g) });
 
-    function fileToNode(file) {
+    function nodeFromVinyl(file) {
         return {
             name: path.relative(base, file.path),
             base: base,
             data: file.contents,
-            mode: file.stat.mode
+            stat: file.stat
         };
     }
 
@@ -42,7 +42,7 @@ module.exports = function (options) {
                 files.push(file);
             });
             stream.on('end', function () {
-                callback(new mix.Tree(files.map(fileToNode)));
+                callback(new mix.Tree(files.map(nodeFromVinyl)));
             }.bind(this));
         }
 

@@ -25,7 +25,9 @@
     "node-sass": "0.9.3",
     "parseurl": "1.0.1",
     "prime": "0.4.2",
+    "rimraf": "2.2.8",
     "tiny-lr": "0.0.8",
+    "vinyl": "0.2.3",
     "vinyl-fs": "0.3.4"
   },
   "engines": {
