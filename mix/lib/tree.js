@@ -18,6 +18,7 @@ Tree.prototype.findNodeByName = function (name) {
                     base: node.base,
                     data: sibling.data,
                     stat: sibling.stat,
+                    metadata: {},
                     siblings: []
                 };
             }

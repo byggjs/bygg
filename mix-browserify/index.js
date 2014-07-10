@@ -132,6 +132,9 @@ module.exports = function (options) {
                     if (sourceMap !== null) {
                         var sourceMapUrlTrailer = '\n//# sourceMappingURL=./' + path.basename(outputNode.name) + '.map';
                         outputNode.data = Buffer.concat([outputNode.data, new Buffer(sourceMapUrlTrailer, 'utf8')]);
+                        outputNode.metadata = mixIn({}, outputNode.metadata, {
+                            sourceMap: outputNode.siblings.length
+                        });
                         outputNode.siblings = node.siblings.slice();
                         outputNode.siblings.push({
                             name: outputNode.name + '.map',
