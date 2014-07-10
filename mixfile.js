@@ -15,7 +15,7 @@ var scripts = files({ base: 'src', globs: 'scripts/app.jsx' })
         extensions: ['.js', '.jsx'],
         configure: function (b) {
             b.transform('reactify');
-            b.require('../node_modules/react/react.js', {expose: 'react'});
+            b.require('../node_modules/react/react.js', { expose: 'react' });
         }
     }))
     .pipe(uglify());
