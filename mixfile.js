@@ -18,14 +18,20 @@ var scripts = files({ base: 'src', globs: 'scripts/app.jsx' })
             b.transform('reactify');
             b.require('../node_modules/react/react.js', { expose: 'react' });
         }
-    }))
-    .pipe(uglify());
+    }));
 var styles = files({ base: 'src', globs: 'styles/app.scss' })
     .pipe(sass())
-    .pipe(autoprefixer('last 2 versions', 'ie 9'))
-    .pipe(minifyCss());
-var build = mix.combine(html, scripts, styles)
+    .pipe(autoprefixer('last 2 versions', 'ie 9'));
+
+var build = mix.combine(html, scripts, styles);
+build
     .pipe(rev())
-    .pipe(stats());
-build.pipe(write('build/'));
-build.pipe(serve(3000));
+    .pipe(serve(3000));
+
+var prodScripts = scripts.pipe(uglify());
+var prodStyles = styles.pipe(minifyCss());
+var prodBuild = mix.combine(html, prodScripts, prodStyles);
+prodBuild
+    .pipe(rev())
+    .pipe(stats())
+    .pipe(write('build/'));
