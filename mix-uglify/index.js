@@ -6,16 +6,17 @@ module.exports = function (options) {
     options = options || {};
 
     return function (tree) {
-        var sources = tree.nodes.map(function (node) { return node.data.toString('utf8'); });
         var start = new Date();
-        var result = UglifyJS.minify(sources, mixIn({}, options, {
-            fromString: true
-        }));
-        console.log('minified JS in ' + (new Date() - start) + ' ms');
-        return new mix.Tree([
-            mixIn({}, tree.nodes[0], {
+        var nodes = tree.nodes.map(function (node) {
+            var source = node.data.toString('utf8');
+            var result = UglifyJS.minify([source], mixIn({}, options, {
+                fromString: true
+            }));
+            return mixIn({}, node, {
                 data: new Buffer(result.code, 'utf8')
-            })
-        ]);
+            });
+        });
+        console.log('minified JS in ' + (new Date() - start) + ' ms');
+        return new mix.Tree(nodes);
     };
 };
