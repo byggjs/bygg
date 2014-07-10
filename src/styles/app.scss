@@ -1,0 +1,8 @@
+$bgcolor: orange;
+
+body {
+    background-color: $bgcolor;
+}
+
+@import "components/hello";
+@import "components/world";
