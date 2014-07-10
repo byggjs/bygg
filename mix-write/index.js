@@ -38,18 +38,26 @@ module.exports = function (dir) {
         return new mix.Stream(function (sink) {
             schedule(function (done) {
                 rimraf(dir, function (error) {
-                    if (!error) {
-                        var stream = vfs.dest(dir);
-                        tree.nodes.map(nodeToVinyl).forEach(function (file) {
-                            stream.write(file);
-                        });
-                        stream.end();
-                        console.log('TODO');
-                    } else {
+                    if (error) {
                         console.log(error);
                         sink.close();
                         done();
                     }
+
+                    var stream = vfs.dest(dir);
+                    tree.nodes.map(nodeToVinyl).forEach(function (file) {
+                        stream.write(file);
+                    });
+                    stream.end();
+                    stream.on('finish', function () {
+                        sink.close(tree);
+                        done();
+                    });
+                    stream.on('error', function (error) {
+                        console.log(error);
+                        sink.close();
+                        done();
+                    });
                 });
             });
         });
