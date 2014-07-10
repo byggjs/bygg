@@ -13,6 +13,7 @@
     "url": "git://github.com/soundrop/mix"
   },
   "dependencies": {
+    "autoprefixer": "2.1.0",
     "browserify": "4.2.0",
     "chokidar": "0.8.2",
     "connect-livereload": "0.4.0",

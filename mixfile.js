@@ -1,3 +1,4 @@
+var autoprefixer = require('mix-autoprefixer');
 var browserify = require('mix-browserify');
 var files = require('mix-files');
 var minifyCss = require('mix-minify-css');
@@ -19,7 +20,7 @@ var scripts = files({ base: 'src', globs: 'scripts/app.jsx' })
         }
     }))
     .pipe(uglify());
-var styles = files({ base: 'src', globs: 'styles/app.scss' }).pipe(sass()).pipe(minifyCss());
+var styles = files({ base: 'src', globs: 'styles/app.scss' }).pipe(sass()).pipe(autoprefixer('last 2 versions', 'ie 9')).pipe(minifyCss());
 var build = mix.combine(html, scripts, styles).pipe(rev()).pipe(stats());
 build.pipe(write('build/'));
 build.pipe(serve(3000));
