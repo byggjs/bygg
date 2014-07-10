@@ -36,6 +36,7 @@
   },
   "homepage": "https://github.com/expressjs/mix",
   "devDependencies": {
+    "clean-css": "2.2.6",
     "envify": "1.2.1",
     "react": "0.10.0",
     "reactify": "0.13.1"
