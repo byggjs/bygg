@@ -100,6 +100,8 @@ module.exports = function (options) {
                         return;
                     }
 
+                    console.log('generated JS in ' + (new Date() - start) + ' ms');
+
                     firstPush = false;
 
                     var target = path.dirname(node.name) + '/' + path.basename(node.name, path.extname(node.name)) + '.js';
@@ -110,8 +112,6 @@ module.exports = function (options) {
                         })
                     ]);
                     sink.push(outputTree);
-
-                    console.log('generated bundle in ' + (new Date() - start) + ' ms');
                 });
             }
 

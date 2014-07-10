@@ -34,15 +34,17 @@ module.exports = function (options) {
             pushCss();
 
             function pushCss() {
-                var start = new Date();
                 var sassFile = path.join(node.base, node.name);
                 var stats = {};
+                var start = new Date();
                 sass.render(mixIn({}, options, {
                     file: sassFile,
                     success: function (css) {
                         if (disposed) {
                             return;
                         }
+
+                        console.log('generated CSS in ' + (new Date() - start) + ' ms');
 
                         depFiles = stats.includedFiles.filter(function (path) {
                             return path !== sassFile;
@@ -59,8 +61,6 @@ module.exports = function (options) {
                             })
                         ]);
                         sink.push(outputTree);
-
-                        console.log('generated CSS in ' + (new Date() - start) + ' ms');
                     },
                     error: function (error) {
                         if (disposed) {
