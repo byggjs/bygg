@@ -25,17 +25,15 @@ module.exports = function (port) {
             if (pathname === '/') {
                 pathname = '/index.html';
             }
-            for (var i = 0; i !== currentTree.nodes.length; i++) {
-                var node = currentTree.nodes[i];
-                if ('/' + node.name === pathname) {
-                    var data = node.data;
-                    res.writeHead(200, {
-                        'Content-Length': data.length,
-                        'Content-Type': mime.lookup(node.name)
-                    });
-                    res.end(data);
-                    return;
-                }
+            var node = currentTree.findNodeByName(pathname.substr(1));
+            if (node !== null) {
+                var data = node.data;
+                res.writeHead(200, {
+                    'Content-Length': data.length,
+                    'Content-Type': mime.lookup(node.name)
+                });
+                res.end(data);
+                return;
             }
         }
 

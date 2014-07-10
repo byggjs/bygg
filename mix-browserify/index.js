@@ -3,6 +3,8 @@ var mix = require('mix');
 var mixIn = require('mout/object/mixIn');
 var path = require('path');
 
+var SOURCEMAPPINGURL_PREFIX = '\n//# sourceMappingURL=data:application/json;base64,';
+
 module.exports = function (options) {
     var currentSink = null;
     var pkgCache = {};
@@ -81,7 +83,8 @@ module.exports = function (options) {
                 var totalLength = 0;
                 var bundleOptions = {
                     includePackage: true,
-                    packageCache: pkgCache
+                    packageCache: pkgCache,
+                    debug: true
                 };
                 if (!firstPush) {
                     bundleOptions.cache = depCache;
@@ -104,13 +107,40 @@ module.exports = function (options) {
 
                     firstPush = false;
 
-                    var target = path.dirname(node.name) + '/' + path.basename(node.name, path.extname(node.name)) + '.js';
-                    var outputTree = new mix.Tree([
-                        mixIn({}, node, {
-                            name: target,
-                            data: Buffer.concat(buffers, totalLength)
-                        })
-                    ]);
+                    var sourceMap = null;
+                    var sourceMapBufferIndex = buffers.length;
+                    var sourceMapTrailerSize = 0;
+                    for (var i = buffers.length - 1; i >= 0; i--) {
+                        var buffer = buffers[i];
+                        sourceMapTrailerSize += buffer.length;
+                        var source = buffer.toString('utf8');
+                        if (source.substr(0, SOURCEMAPPINGURL_PREFIX.length) === SOURCEMAPPINGURL_PREFIX) {
+                            sourceMap = new Buffer(source.substr(SOURCEMAPPINGURL_PREFIX.length), 'base64');
+                            sourceMapBufferIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (sourceMap !== null) {
+                        totalLength -= sourceMapTrailerSize;
+                    }
+
+                    var outputNode = mixIn({}, node, {
+                        name: path.dirname(node.name) + '/' + path.basename(node.name, path.extname(node.name)) + '.js',
+                        data: Buffer.concat(buffers.slice(0, sourceMapBufferIndex), totalLength)
+                    });
+                    if (sourceMap !== null) {
+                        var sourceMapUrlTrailer = '\n//# sourceMappingURL=./' + path.basename(outputNode.name) + '.map';
+                        outputNode.data = Buffer.concat([outputNode.data, new Buffer(sourceMapUrlTrailer, 'utf8')]);
+                        outputNode.siblings = node.siblings.slice();
+                        outputNode.siblings.push({
+                            name: outputNode.name + '.map',
+                            data: sourceMap,
+                            stat: node.stat
+                        });
+                    }
+
+                    var outputTree = new mix.Tree([outputNode]);
                     sink.push(outputTree);
                 });
             }

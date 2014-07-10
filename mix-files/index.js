@@ -18,7 +18,8 @@ module.exports = function (options) {
             name: path.relative(base, file.path),
             base: base,
             data: file.contents,
-            stat: file.stat
+            stat: file.stat,
+            siblings: []
         };
     }
 

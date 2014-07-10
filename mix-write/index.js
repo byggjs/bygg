@@ -25,13 +25,23 @@ module.exports = function (dir) {
     }
 
     function nodeToVinyl(node) {
-        return new File({
-            cwd: node.base,
-            base: node.base,
-            path: path.join(node.base, node.name),
-            stat: node.stat,
-            contents: node.data
-        });
+        return [
+            new File({
+                cwd: node.base,
+                base: node.base,
+                path: path.join(node.base, node.name),
+                stat: node.stat,
+                contents: node.data
+            })
+        ].concat(node.siblings.map(function (sibling) {
+            return new File({
+                cwd: node.base,
+                base: node.base,
+                path: path.join(node.base, sibling.name),
+                stat: sibling.stat,
+                contents: sibling.data
+            });
+        }));
     }
 
     return function (tree) {
@@ -45,8 +55,10 @@ module.exports = function (dir) {
                     }
 
                     var stream = vfs.dest(dir);
-                    tree.nodes.map(nodeToVinyl).forEach(function (file) {
-                        stream.write(file);
+                    tree.nodes.map(nodeToVinyl).forEach(function (files) {
+                        files.forEach(function (file) {
+                            stream.write(file);
+                        });
                     });
                     stream.end();
                     stream.on('finish', function () {
