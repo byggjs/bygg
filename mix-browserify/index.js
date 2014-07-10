@@ -1,25 +1,15 @@
-var prime = require('prime');
-var Emitter = require('prime/emitter');
-var Kefir = require('kefir');
 var browserify = require('browserify');
-var chokidar = require('chokidar');
 var mix = require('mix');
 var mixIn = require('mout/object/mixIn');
 var path = require('path');
 
-module.exports = function (target, options) {
+module.exports = function (options) {
     var currentSink = null;
     var pkgCache = {};
     var depCache = {};
     var firstPush = true;
 
-    if (typeof target === 'object') {
-        options = target;
-        target = null;
-    } else {
-        target = target || null;
-        options = options || {};
-    }
+    options = options || {};
 
     var configure = options.configure || function () {};
     delete options.configure;
@@ -41,8 +31,8 @@ module.exports = function (target, options) {
         return new mix.Stream(function (sink) {
             currentSink = sink;
 
-            var watcher = new Watcher();
             var disposed = false;
+            var watcher = new mix.Watcher();
 
             var b = browserify(mixIn({}, options, { basedir: node.base }));
 
@@ -112,9 +102,10 @@ module.exports = function (target, options) {
 
                     firstPush = false;
 
+                    var target = path.dirname(node.name) + '/' + path.basename(node.name, path.extname(node.name)) + '.js';
                     var outputTree = new mix.Tree([
                         mixIn({}, node, {
-                            name: target || node.name,
+                            name: target,
                             data: Buffer.concat(buffers, totalLength)
                         })
                     ]);
@@ -126,135 +117,8 @@ module.exports = function (target, options) {
 
             return function dispose() {
                 watcher.dispose();
-                watcher = null;
-
                 disposed = true;
             };
         });
     };
 };
-
-var Watcher = prime({
-    mixin: Emitter,
-    constructor: function () {
-        var watcher = null;
-        var eventSink = null;
-
-        Kefir.fromBinder(function (sink) {
-            this._sink = sink;
-            return function dispose() {
-                if (watcher !== null) {
-                    watcher.close();
-                    watcher = null;
-                }
-                this._sink = null;
-            }.bind(this);
-        }, this).scan({}, function (files, update) {
-            var operation = update[0];
-            var path = update[1];
-            if (operation === '+') {
-                files[path] = true;
-            } else {
-                delete files[path];
-            }
-            return files;
-        }).flatMap(debounce(600)).skipDuplicates(function (previous, next) {
-            return filesToString(previous) === filesToString(next);
-        }).onValue(function (files) {
-            if (eventSink !== null) {
-                eventSink(Kefir.END);
-            }
-            if (watcher !== null) {
-                watcher.close();
-            }
-            watcher = chokidar.watch(Object.keys(files), {
-                persistent: false
-            });
-            Kefir.fromBinder(function (sink) {
-                eventSink = sink;
-                watcher.on('change', function (path) {
-                    eventSink(['+', path]);
-                });
-            }).scan({}, function (changed, update) {
-                var operation = update[0];
-                var path = update[1];
-                if (operation === '+') {
-                    changed[path] = true;
-                } else {
-                    delete changed[path];
-                }
-                return changed;
-            }).flatMap(debounce(10, 600)).onValue(function (changed) {
-                var files = Object.keys(changed);
-                if (files.length > 0) {
-                    files.forEach(function (path) {
-                        eventSink(['-', path]);
-                    });
-                    this.emit('change', files);
-                }
-            }, this);
-        }, this);
-
-        function filesToString(files) {
-            return Object.keys(files).sort().join(':');
-        }
-    },
-    dispose: function () {
-        this._sink(Kefir.END);
-    },
-    add: function (path) {
-        this._sink(['+', path]);
-    },
-    remove: function (path) {
-        this._sink(['-', path]);
-    }
-});
-
-function debounce(wait, maxWait) {
-    var firstValueAt = null;
-    var pendingSink = null;
-
-    maxWait = maxWait || wait;
-
-    return function (value) {
-        if (pendingSink !== null) {
-            pendingSink(Kefir.END);
-            pendingSink = null;
-        }
-
-        if (firstValueAt === null) {
-            firstValueAt = new Date();
-        }
-
-        return Kefir.fromBinder(function (sink) {
-            var timer;
-
-            pendingSink = sink;
-
-            var now = new Date();
-            var elapsed = now - firstValueAt;
-            if (elapsed >= maxWait) {
-                pushValue();
-            } else {
-                var delay = Math.min(wait, maxWait - elapsed);
-                timer = setTimeout(pushValue, delay);
-            }
-
-            function pushValue() {
-                timer = null;
-                sink(value);
-                sink(Kefir.END);
-            }
-
-            return function dispose() {
-                firstValueAt = null;
-                pendingSink = null;
-
-                if (timer !== null) {
-                    clearTimeout(timer);
-                    timer = null;
-                }
-            };
-        });
-    };
-}

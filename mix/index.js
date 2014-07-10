@@ -1,6 +1,7 @@
 var Kefir = require('kefir');
 var Stream = require('./lib/stream');
 var Tree = require('./lib/tree');
+var Watcher = require('./lib/watcher');
 
 function combine() {
     var streams = Array.prototype.slice.call(arguments);
@@ -14,5 +15,6 @@ function combine() {
 module.exports = {
     combine: combine,
     Stream: Stream,
-    Tree: Tree
+    Tree: Tree,
+    Watcher: Watcher
 };
