@@ -15,11 +15,10 @@ module.exports = function (options) {
     return function (tree) {
         var start = new Date();
         var nodes = tree.nodes.map(function (node) {
-            var filename = path.join(node.base, node.name);
             var source = node.data.toString('utf8');
 
             var ast = UglifyJS.parse(source, {
-                filename: filename,
+                filename: path.join(node.base, node.name),
                 toplevel: null
             });
 
@@ -35,29 +34,34 @@ module.exports = function (options) {
                 ast.mangle_names(options.mangle);
             }
 
-            var sourceMap = null;
+            var sourceMapNode = null;
             var outputOptions = {};
             if (node.metadata.hasOwnProperty('sourceMap')) {
-                sourceMap = node.siblings[node.metadata.sourceMap];
+                sourceMapNode = node.siblings[node.metadata.sourceMap];
+                var sourceMapBlob = sourceMapNode.data.toString('utf8');
                 outputOptions.source_map = UglifyJS.SourceMap({
                     file: node.name,
-                    orig: sourceMap.data.toString('utf8'),
+                    orig: sourceMapBlob,
                     root: options.sourceRoot
                 });
-                outputOptions.source_map.get().setSourceContent(filename, source);
+                var sourceMap = JSON.parse(sourceMapBlob);
+                var outputMap = outputOptions.source_map.get();
+                sourceMap.sources.forEach(function (source, i) {
+                    outputMap.setSourceContent(source, sourceMap.sourcesContent[i]);
+                });
             }
 
             var outputSource = ast.print_to_string(outputOptions);
-            if (sourceMap !== null) {
-                outputSource += '\n//# sourceMappingURL=./' + path.basename(sourceMap.name);
+            if (sourceMapNode !== null) {
+                outputSource += '\n//# sourceMappingURL=./' + path.basename(sourceMapNode.name);
             }
 
             var outputNode = mixIn({}, node, {
                 data: new Buffer(outputSource, 'utf8')
             });
-            if (sourceMap !== null) {
+            if (sourceMapNode !== null) {
                 outputNode.siblings[node.metadata.sourceMap] = {
-                    name: sourceMap.name,
+                    name: sourceMapNode.name,
                     data: new Buffer(outputOptions.source_map + '', 'utf8')
                 };
             }

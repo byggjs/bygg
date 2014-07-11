@@ -107,7 +107,7 @@ module.exports = function (options) {
 
                     firstPush = false;
 
-                    var sourceMap = null;
+                    var sourceMapData = null;
                     var sourceMapBufferIndex = buffers.length;
                     var sourceMapTrailerSize = 0;
                     for (var i = buffers.length - 1; i >= 0; i--) {
@@ -115,13 +115,15 @@ module.exports = function (options) {
                         sourceMapTrailerSize += buffer.length;
                         var source = buffer.toString('utf8');
                         if (source.substr(0, SOURCEMAPPINGURL_PREFIX.length) === SOURCEMAPPINGURL_PREFIX) {
-                            sourceMap = new Buffer(source.substr(SOURCEMAPPINGURL_PREFIX.length), 'base64');
+                            var originalSourceMap = JSON.parse(new Buffer(source.substr(SOURCEMAPPINGURL_PREFIX.length), 'base64').toString('utf8'));
+                            var modifiedSourceMap = fixupSourceMap(originalSourceMap);
+                            sourceMapData = new Buffer(JSON.stringify(modifiedSourceMap), 'utf8');
                             sourceMapBufferIndex = i;
                             break;
                         }
                     }
 
-                    if (sourceMap !== null) {
+                    if (sourceMapData !== null) {
                         totalLength -= sourceMapTrailerSize;
                     }
 
@@ -129,7 +131,7 @@ module.exports = function (options) {
                         name: path.dirname(node.name) + '/' + path.basename(node.name, path.extname(node.name)) + '.js',
                         data: Buffer.concat(buffers.slice(0, sourceMapBufferIndex), totalLength)
                     });
-                    if (sourceMap !== null) {
+                    if (sourceMapData !== null) {
                         var sourceMapUrlTrailer = '\n//# sourceMappingURL=./' + path.basename(outputNode.name) + '.map';
                         outputNode.data = Buffer.concat([outputNode.data, new Buffer(sourceMapUrlTrailer, 'utf8')]);
                         outputNode.metadata = mixIn({}, outputNode.metadata, {
@@ -138,7 +140,7 @@ module.exports = function (options) {
                         outputNode.siblings = node.siblings.slice();
                         outputNode.siblings.push({
                             name: outputNode.name + '.map',
-                            data: sourceMap,
+                            data: sourceMapData,
                             stat: node.stat
                         });
                     }
@@ -146,6 +148,14 @@ module.exports = function (options) {
                     var outputTree = new mix.Tree([outputNode]);
                     sink.push(outputTree);
                 });
+            }
+
+            function fixupSourceMap(sourceMap) {
+                var result = mixIn({}, sourceMap);
+                result.sources = sourceMap.sources.map(function (source) {
+                    return path.relative(node.base, source);
+                });
+                return result;
             }
 
             return function dispose() {
