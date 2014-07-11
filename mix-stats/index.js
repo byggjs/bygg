@@ -2,7 +2,9 @@
 
 module.exports = function () {
     return function (tree) {
-        // TODO: implement
+        tree.nodes.forEach(function (node) {
+            console.log(node.name + ': ' + node.data.length + ' bytes');
+        });
         return tree;
     };
 };
