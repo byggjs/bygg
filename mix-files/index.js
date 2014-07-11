@@ -1,3 +1,5 @@
+'use strict';
+
 var mix = require('mix');
 var path = require('path');
 var vfs = require('vinyl-fs');

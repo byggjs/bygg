@@ -1,3 +1,5 @@
+'use strict';
+
 var autoprefixer = require('autoprefixer');
 var mix = require('mix');
 var mixIn = require('mout/object/mixIn');

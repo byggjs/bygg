@@ -1,3 +1,5 @@
+'use strict';
+
 var mix = require('mix');
 var mixIn = require('mout/object/mixIn');
 var path = require('path');

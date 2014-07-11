@@ -1,3 +1,5 @@
+'use strict';
+
 var Emitter = require('prime/emitter');
 var Kefir = require('kefir');
 var chokidar = require('chokidar');

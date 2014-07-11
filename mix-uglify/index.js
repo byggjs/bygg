@@ -1,3 +1,5 @@
+'use strict';
+
 var UglifyJS = require('uglify-js');
 var mix = require('mix');
 var mixIn = require('mout/object/mixIn');

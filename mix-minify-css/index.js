@@ -1,3 +1,5 @@
+'use strict';
+
 var CleanCSS = require('clean-css');
 var mix = require('mix');
 var mixIn = require('mout/object/mixIn');

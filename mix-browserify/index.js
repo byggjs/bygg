@@ -1,3 +1,5 @@
+'use strict';
+
 var browserify = require('browserify');
 var mix = require('mix');
 var mixIn = require('mout/object/mixIn');

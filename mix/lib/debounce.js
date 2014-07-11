@@ -1,3 +1,5 @@
+'use strict';
+
 var Kefir = require('kefir');
 
 module.exports = function debounce(wait, maxWait) {

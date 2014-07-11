@@ -1,3 +1,5 @@
+'use strict';
+
 var autoprefixer = require('mix-autoprefixer');
 var browserify = require('mix-browserify');
 var files = require('mix-files');

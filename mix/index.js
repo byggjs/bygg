@@ -1,3 +1,5 @@
+'use strict';
+
 var Kefir = require('kefir');
 var Stream = require('./lib/stream');
 var Tree = require('./lib/tree');
