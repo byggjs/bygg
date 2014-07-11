@@ -6,13 +6,21 @@ var mixIn = require('mout/object/mixIn');
 var path = require('path');
 
 module.exports = function (options) {
-    options = mixIn({}, {
+    options = mixIn({
+        screw_ie8: true,
         warnings: false,
         compress: {},
         mangle: {},
-        output: null,
+        output: {},
         sourceRoot: null
     }, options || {});
+
+    if (options.screw_ie8) {
+        options.compress.screw_ie8 = true;
+        options.mangle.screw_ie8 = true;
+        options.output.screw_ie8 = true;
+        delete options.screw_ie8;
+    }
 
     return function (tree) {
         var start = new Date();
@@ -37,7 +45,7 @@ module.exports = function (options) {
             }
 
             var sourceMapNode = null;
-            var outputOptions = {};
+            var outputOptions = mixIn({}, options.output);
             if (node.metadata.hasOwnProperty('sourceMap')) {
                 sourceMapNode = node.siblings[node.metadata.sourceMap];
                 var sourceMapBlob = sourceMapNode.data.toString('utf8');
