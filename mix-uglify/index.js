@@ -71,6 +71,7 @@ module.exports = function (options) {
                 data: new Buffer(outputSource, 'utf8')
             });
             if (sourceMapNode !== null) {
+                outputNode.siblings = node.siblings.slice();
                 outputNode.siblings[node.metadata.sourceMap] = {
                     name: sourceMapNode.name,
                     data: new Buffer(outputOptions.source_map + '', 'utf8')
