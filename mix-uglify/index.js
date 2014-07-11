@@ -19,7 +19,6 @@ module.exports = function (options) {
         options.compress.screw_ie8 = true;
         options.mangle.screw_ie8 = true;
         options.output.screw_ie8 = true;
-        delete options.screw_ie8;
     }
 
     return function (tree) {
@@ -32,14 +31,16 @@ module.exports = function (options) {
                 toplevel: null
             });
 
+            var scopeOptions = { screw_ie8: options.screw_ie8 };
+
             if (options.compress) {
-                ast.figure_out_scope();
+                ast.figure_out_scope(scopeOptions);
                 var compressOptions = mixIn({ warnings: options.warnings }, options.compress);
                 ast = ast.transform(UglifyJS.Compressor(compressOptions));
             }
 
             if (options.mangle) {
-                ast.figure_out_scope();
+                ast.figure_out_scope(scopeOptions);
                 ast.compute_char_frequency();
                 ast.mangle_names(options.mangle);
             }
