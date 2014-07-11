@@ -56,13 +56,10 @@ module.exports = function (options) {
                         });
 
                         var target = path.dirname(node.name) + '/' + path.basename(node.name, path.extname(node.name)) + '.css';
-                        var outputTree = new mix.Tree([
-                            mixIn({}, node, {
-                                name: target,
-                                data: new Buffer(css, 'utf8')
-                            })
-                        ]);
-                        sink.push(outputTree);
+                        var outputNode = tree.cloneNode(node);
+                        outputNode.name = target;
+                        outputNode.data = new Buffer(css, 'utf8');
+                        sink.push(new mix.Tree([outputNode]));
                     },
                     error: function (error) {
                         if (disposed) {

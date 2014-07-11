@@ -1,10 +1,23 @@
 'use strict';
 
+var mixIn = require('mout/object/mixIn');
+
 module.exports = Tree;
 
 function Tree(nodes) {
     this.nodes = nodes;
 }
+
+Tree.prototype.cloneNode = function (node) {
+    var clone = mixIn({}, node);
+    clone.metadata = mixIn({}, node.metadata);
+    clone.sibling = node.siblings.slice();
+    return clone;
+};
+
+Tree.prototype.cloneSibling = function (sibling, node) {
+    return mixIn({}, sibling);
+};
 
 Tree.prototype.findNodeByName = function (name) {
     for (var nodeIndex = 0; nodeIndex !== this.nodes.length; nodeIndex++) {

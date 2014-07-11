@@ -2,7 +2,6 @@
 
 var CleanCSS = require('clean-css');
 var mix = require('mix');
-var mixIn = require('mout/object/mixIn');
 
 module.exports = function (options) {
     options = options || {};
@@ -12,9 +11,9 @@ module.exports = function (options) {
         var nodes = tree.nodes.map(function (node) {
             var input = node.data.toString('utf8');
             var output = new CleanCSS(options).minify(input);
-            return mixIn({}, node, {
-                data: new Buffer(output, 'utf8')
-            });
+            var outputNode = tree.cloneNode(node);
+            outputNode.data = new Buffer(output, 'utf8');
+            return outputNode;
         });
         console.log('minified CSS in ' + (new Date() - start) + ' ms');
         return new mix.Tree(nodes);

@@ -2,7 +2,6 @@
 
 var autoprefixer = require('autoprefixer');
 var mix = require('mix');
-var mixIn = require('mout/object/mixIn');
 
 var DEFAULT_CONSTRAINTS = ['last 2 versions', 'ie 9'];
 
@@ -14,9 +13,9 @@ module.exports = function () {
         var nodes = tree.nodes.map(function (node) {
             var input = node.data.toString('utf8');
             var result = autoprefixer.call(constraints).process(input);
-            return mixIn({}, node, {
-                data: new Buffer(result.css, 'utf8')
-            });
+            var outputNode = tree.cloneNode(node);
+            outputNode.data = new Buffer(result.css, 'utf8');
+            return outputNode;
         });
         console.log('autoprefixed CSS in ' + (new Date() - start) + ' ms');
         return new mix.Tree(nodes);

@@ -67,11 +67,9 @@ module.exports = function (options) {
                 outputSource += '\n//# sourceMappingURL=./' + path.basename(sourceMapNode.name);
             }
 
-            var outputNode = mixIn({}, node, {
-                data: new Buffer(outputSource, 'utf8')
-            });
+            var outputNode = tree.cloneNode(node);
+            outputNode.data = new Buffer(outputSource, 'utf8');
             if (sourceMapNode !== null) {
-                outputNode.siblings = node.siblings.slice();
                 outputNode.siblings[node.metadata.sourceMap] = {
                     name: sourceMapNode.name,
                     data: new Buffer(outputOptions.source_map + '', 'utf8')
