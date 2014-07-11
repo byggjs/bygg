@@ -34,7 +34,7 @@ function Stream(value) {
 Stream.prototype.pipe = function (sink) {
     this._consumers++;
     return new Stream(this._observable.flatMap(function (input) {
-        output = sink(input);
+        var output = sink(input);
         if (output instanceof Stream) {
             return output._observable;
         } else {
