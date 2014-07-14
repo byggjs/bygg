@@ -37,7 +37,7 @@ module.exports = function (options) {
                         if (result.length !== 1 || !options.showFiles || totalSize === 0) {
                             log(options.title, chalk.green('total'), totalSize, options.gzip);
                         }
-                        sink.close();
+                        sink.close(tree);
                     }
                 }
 
