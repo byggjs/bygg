@@ -8,38 +8,56 @@ var morgan = require('morgan');
 var parseurl = require('parseurl');
 var tinylr = require('tiny-lr');
 
-module.exports = function (port) {
+module.exports = function (port, behavior) {
     var tinylrServer = tinylr();
     var app = express()
         // .use(morgan())
         .use(livereload({ port: port }))
-        .use(onRequest)
+        .use(staticMiddleware);
+    if (behavior) {
+        app = behavior(app, getNodeData);
+    }
+    app
+        .use(fileMiddleware('index.html'))
         .use(tinylrServer.handler.bind(tinylrServer));
     var server = http.createServer(app);
     server.on('upgrade', tinylrServer.websocketify.bind(tinylrServer));
     server.listen(port);
 
     var currentTree = new mix.Tree([]);
-    function onRequest(req, res, next) {
-        if (req.method === 'GET') {
-            var pathname = parseurl(req).pathname;
-            if (pathname === '/') {
-                pathname = '/index.html';
-            }
-            var node = currentTree.findNodeByName(pathname.substr(1));
-            if (node !== null) {
+
+    function staticMiddleware(req, res, next) {
+        var pathname = parseurl(req).pathname;
+        return fileMiddleware(pathname.substr(1))(req, res, next);
+    }
+
+    function fileMiddleware(name) {
+        return function (req, res, next) {
+            var node = currentTree.findNodeByName(name);
+            if (node !== null && (req.method === 'GET' || req.method === 'HEAD')) {
                 var data = node.data;
                 res.writeHead(200, {
                     'Content-Length': data.length,
                     'Content-Type': node.metadata.mime
                 });
-                res.end(data);
-                return;
+                if (req.method === 'GET') {
+                    res.end(data);
+                } else {
+                    res.end();
+                }
+            } else {
+                next();
             }
         }
+    }
 
-        next();
-        // TODO: try_files
+    function getNodeData(name, callback) {
+        var node = currentTree.findNodeByName(name);
+        if (node !== null) {
+            callback(null, node.data);
+        } else {
+            callback(new Error('not-found'));
+        }
     }
 
     return function (tree) {
