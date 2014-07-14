@@ -8,21 +8,21 @@ var morgan = require('morgan');
 var parseurl = require('parseurl');
 var tinylr = require('tiny-lr');
 
+var LIVERELOAD_PORT = 35729;
+
 module.exports = function (port, behavior) {
     var tinylrServer = tinylr();
+    tinylrServer.listen(LIVERELOAD_PORT);
+
     var app = express()
         // .use(morgan())
-        .use(livereload({ port: port }))
+        .use(livereload({ port: LIVERELOAD_PORT }))
         .use(staticMiddleware);
     if (behavior) {
         app = behavior(app, getNodeData);
     }
-    app
-        .use(fileMiddleware('index.html'))
-        .use(tinylrServer.handler.bind(tinylrServer));
-    var server = http.createServer(app);
-    server.on('upgrade', tinylrServer.websocketify.bind(tinylrServer));
-    server.listen(port);
+    app.use(fileMiddleware('index.html'));
+    app.listen(port);
 
     var currentTree = new mix.Tree([]);
 
@@ -62,7 +62,9 @@ module.exports = function (port, behavior) {
 
     return function (tree) {
         currentTree = tree;
-        tinylr.changed('/not-used-anyway');
+        tree.nodes.forEach(function (node) {
+            tinylr.changed('/' + node.name);
+        });
         return tree;
     };
 };
