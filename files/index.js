@@ -45,8 +45,10 @@ module.exports = function (options) {
             });
             var files = [];
             stream.on('data', function (file) {
-                watcher.add(file.path);
-                files.push(file);
+                if (!file.isNull()) {
+                    watcher.add(file.path);
+                    files.push(file);
+                }
             });
             stream.on('end', function () {
                 callback(new mix.Tree(files.map(nodeFromVinyl)));
