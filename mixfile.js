@@ -30,7 +30,8 @@ var styles = files({ base: 'src', globs: 'styles/app.scss' })
     .pipe(sass())
     .pipe(autoprefixer('last 2 versions', 'ie 9'))
     .pipe(minifyCss());
-var build = mix.combine(html, scripts, styles)
+var images = files({ base: 'src', globs: 'images/**/*' });
+var build = mix.combine(html, scripts, styles, images)
     .pipe(rev())
     .pipe(stats());
 build.pipe(write('build/'));

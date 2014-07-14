@@ -10,6 +10,8 @@ var App = React.createClass({
             <div>
                 <Hello />
                 <World />
+                <div className='soundrop-logo' />
+                <div className='spotify-logo' />
             </div>
         );
     }
