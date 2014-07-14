@@ -151,6 +151,7 @@ module.exports = function (options) {
                     var outputNode = tree.cloneNode(node);
                     outputNode.name = path.dirname(node.name) + '/' + path.basename(node.name, path.extname(node.name)) + '.js';
                     outputNode.data = Buffer.concat(buffers.slice(0, sourceMapBufferIndex), totalLength);
+                    outputNode.metadata.mime = 'application/javascript';
                     if (sourceMapData !== null) {
                         var sourceMapUrlTrailer = '\n//# sourceMappingURL=./' + path.basename(outputNode.name) + '.map';
                         outputNode.data = Buffer.concat([outputNode.data, new Buffer(sourceMapUrlTrailer, 'utf8')]);

@@ -1,5 +1,6 @@
 'use strict';
 
+var mime = require('mime');
 var mix = require('mix');
 var path = require('path');
 var vfs = require('vinyl-fs');
@@ -21,7 +22,9 @@ module.exports = function (options) {
             base: base,
             data: file.contents,
             stat: file.stat,
-            metadata: {},
+            metadata: {
+                mime: mime.lookup(file.path)
+            },
             siblings: []
         };
     }

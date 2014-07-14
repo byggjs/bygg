@@ -59,6 +59,7 @@ module.exports = function (options) {
                         var outputNode = tree.cloneNode(node);
                         outputNode.name = target;
                         outputNode.data = new Buffer(css, 'utf8');
+                        outputNode.metadata.mime = 'text/css';
                         sink.push(new mix.Tree([outputNode]));
                     },
                     error: function (error) {

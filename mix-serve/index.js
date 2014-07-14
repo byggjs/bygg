@@ -3,7 +3,6 @@
 var express = require('express');
 var http = require('http');
 var livereload = require('connect-livereload');
-var mime = require('mime');
 var mix = require('mix');
 var morgan = require('morgan');
 var parseurl = require('parseurl');
@@ -32,7 +31,7 @@ module.exports = function (port) {
                 var data = node.data;
                 res.writeHead(200, {
                     'Content-Length': data.length,
-                    'Content-Type': mime.lookup(node.name)
+                    'Content-Type': node.metadata.mime
                 });
                 res.end(data);
                 return;
