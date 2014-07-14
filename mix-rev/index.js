@@ -13,13 +13,18 @@ module.exports = function (options) {
         var deps = resolveDependencies(tree.nodes);
 
         var nodeMap = deps.reduce(function (nodeMap, dep) {
-            var contents = dep.node.data.toString('utf8');
-            Object.keys(dep.refs).forEach(function (reference) {
-                var referencedNode = dep.refs[reference];
-                contents = contents.replace(new RegExp(reference, 'g'), replacement(reference, nodeMap[referencedNode.name]));
-            });
+            var data;
+            if (Object.keys(dep.refs).length > 0) {
+                var contents = dep.node.data.toString('utf8');
+                Object.keys(dep.refs).forEach(function (reference) {
+                    var referencedNode = dep.refs[reference];
+                    contents = contents.replace(new RegExp(reference, 'g'), replacement(reference, nodeMap[referencedNode.name]));
+                });
+                data = new Buffer(contents, 'utf8');
+            } else {
+                data = dep.node.data;
+            }
             var name = dep.node.name;
-            var data = new Buffer(contents, 'utf8');
             var revision = md5(data).substr(0, 8);
             var extension = path.extname(name);
             var revName = (name !== entrypoint) ? joinPath(dirName(name), path.basename(name, extension) + '-' + revision + extension) : name;
@@ -82,7 +87,7 @@ function resolveDependencies(nodes, nodeMap, stack) {
 
         var refs = {};
         var siblingOf = nodeMap[node.name].siblingOf;
-        if (siblingOf === null) {
+        if (siblingOf === null && !isBinary(node)) {
             var contents = node.data.toString('utf8');
             var filepathRegex = /(?:\'|\"|\(|\/\/# sourceMappingURL=)([a-z0-9_@\-\/\.]{2,})/ig;
             var match;
@@ -138,4 +143,21 @@ function joinPath(directory, filename) {
 
 function md5(data) {
     return crypto.createHash('md5').update(data).digest('hex');
+}
+
+function isBinary(node) {
+    var mime = node.metadata.mime;
+    if (!mime) {
+        return false;
+    }
+
+    if (mime.indexOf('text/') === 0) {
+        return false;
+    }
+
+    if (mime === 'application/javascript' || mime === 'application/json') {
+        return false;
+    }
+
+    return true;
 }
