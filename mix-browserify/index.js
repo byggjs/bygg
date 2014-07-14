@@ -11,6 +11,9 @@ module.exports = function (options) {
     var currentSink = null;
     var pkgCache = {};
     var depCache = {};
+    var upToDate = {};
+    var changedNodes = {};
+    var changedEventSink = null;
     var firstPush = true;
 
     options = options || {};
@@ -18,7 +21,11 @@ module.exports = function (options) {
     var configure = options.configure || function () {};
     delete options.configure;
 
-    return function (tree) {
+    var changed = new mix.Stream(function (sink) {
+        changedEventSink = sink;
+    });
+
+    function processTree(tree) {
         if (tree.nodes.length !== 1) {
             throw new Error('Exactly one file must be specified for browserification');
         }
@@ -46,6 +53,17 @@ module.exports = function (options) {
                 pkgCache[file] = pkg;
             });
             b.on('dep', function (dep) {
+                var node = tree.findNode(function (name, base) {
+                    return dep.id.indexOf(base) === 0;
+                });
+                if (node !== null && !upToDate[dep.id]) {
+                    upToDate[dep.id] = true;
+                    var depNode = tree.cloneNode(node);
+                    depNode.name = path.relative(node.base, dep.id);
+                    depNode.data = new Buffer(dep.source, 'utf8');
+                    changedNodes[depNode.name] = depNode;
+                }
+
                 depCache[dep.id] = dep;
                 if (dep.id !== entrypoint) {
                     watcher.add(dep.id);
@@ -71,6 +89,7 @@ module.exports = function (options) {
 
                 files.forEach(function (path) {
                     delete depCache[path];
+                    delete upToDate[path];
                     watcher.remove(path);
                 });
                 pushBundle();
@@ -145,6 +164,15 @@ module.exports = function (options) {
 
                     var outputTree = new mix.Tree([outputNode]);
                     sink.push(outputTree);
+
+                    var nodes = [];
+                    Object.keys(changedNodes).forEach(function (name) {
+                        nodes.push(changedNodes[name]);
+                    });
+                    changedNodes = {};
+                    if (nodes.length > 0) {
+                        changedEventSink.push(new mix.Tree(nodes));
+                    }
                 });
             }
 
@@ -162,4 +190,8 @@ module.exports = function (options) {
             };
         });
     };
+
+    Object.defineProperty(processTree, 'changed', { value: changed });
+
+    return processTree;
 };
