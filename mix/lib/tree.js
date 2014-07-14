@@ -1,6 +1,7 @@
 'use strict';
 
 var mixIn = require('mout/object/mixIn');
+var path = require('path');
 
 module.exports = Tree;
 
@@ -20,14 +21,26 @@ Tree.prototype.cloneSibling = function (sibling, node) {
 };
 
 Tree.prototype.findNodeByName = function (name) {
+    return this.findNode(function (n) {
+        return n === name;
+    });
+};
+
+Tree.prototype.findNodeByPath = function (absPath) {
+    return this.findNode(function (name, base) {
+        return path.join(base, name) === absPath;
+    });
+};
+
+Tree.prototype.findNode = function (predicate) {
     for (var nodeIndex = 0; nodeIndex !== this.nodes.length; nodeIndex++) {
         var node = this.nodes[nodeIndex];
-        if (node.name === name) {
+        if (predicate(node.name, node.base)) {
             return node;
         }
         for (var siblingIndex = 0; siblingIndex !== node.siblings.length; siblingIndex++) {
             var sibling = node.siblings[siblingIndex];
-            if (sibling.name === name) {
+            if (predicate(sibling.name, node.base)) {
                 return {
                     name: sibling.name,
                     base: node.base,
