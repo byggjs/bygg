@@ -12,7 +12,7 @@ function Tree(nodes) {
 Tree.prototype.cloneNode = function (node) {
     var clone = mixIn({}, node);
     clone.metadata = mixIn({}, node.metadata);
-    clone.sibling = node.siblings.slice();
+    clone.siblings = node.siblings.slice();
     return clone;
 };
 
