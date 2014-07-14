@@ -9,48 +9,43 @@ var prettyBytes = require('pretty-bytes');
 
 module.exports = function (options) {
     options = mixIn({
-        showFiles: true,
-        gzip: true
+        showFiles: true
     }, options || {});
 
     return function (tree) {
         var result = [];
-        var totalSize = 0;
+        var rawTotalSize = 0;
+        var gzTotalSize = 0;
         var remaining = tree.nodes.length;
 
         tree.nodes.forEach(function (node, i) {
             result.push(null);
 
-            function finish(err, size) {
-                result[i] = { name: node.name, size: size };
+            gzipSize(node.data, function (err, gzSize) {
+                result[i] = { name: node.name, rawSize: node.data.length, gzSize: gzSize };
 
-                totalSize += size;
+                rawTotalSize += node.data.length;
+                gzTotalSize += gzSize;
 
                 if (--remaining === 0) {
                     result.forEach(function (file) {
-                        if (options.showFiles === true && file.size > 0) {
-                            log(options.title, chalk.blue(file.name), file.size, options.gzip);
+                        if (options.showFiles === true && file.rawSize > 0) {
+                            log(options.title, chalk.blue(file.name), file.rawSize, file.gzSize);
                         }
                     });
-                    if (result.length !== 1 || !options.showFiles || totalSize === 0) {
-                        log(options.title, chalk.green('total'), totalSize, options.gzip);
+                    if (result.length !== 1 || !options.showFiles || rawTotalSize === 0) {
+                        log(options.title, chalk.green('total'), rawTotalSize, gzTotalSize);
                     }
                 }
-            }
-
-            if (options.gzip) {
-                gzipSize(node.data, finish);
-            } else {
-                finish(null, node.data.length);
-            }
+            });
         });
 
         return tree;
     };
 };
 
-function log(title, what, size, gzip) {
+function log(title, what, rawSize, gzSize) {
     title = title ? ('\'' + chalk.cyan(title) + '\' ') : '';
-    console.log(title + what + ' ' + chalk.magenta(prettyBytes(size)) +
-        (gzip ? chalk.gray(' (gzipped)') : ''));
+    console.log(title + what + ' ' + chalk.gray(prettyBytes(rawSize)) +
+        chalk.magenta(' (' + prettyBytes(gzSize) + ' gzipped)'));
 }
