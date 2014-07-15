@@ -116,8 +116,8 @@ module.exports = function (options) {
                     buffers.push(buffer);
                     totalLength += buffer.length;
                 });
-                output.on('error', function () {
-                    // TODO: handle
+                output.on('error', function (error) {
+                    console.log(error);
                 });
                 output.on('end', function () {
                     if (disposed) {
