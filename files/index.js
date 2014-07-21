@@ -14,7 +14,6 @@ module.exports = function (options) {
     } else {
         globs = options.globs;
     }
-    globs = globs.map(function (g) { return path.join(base, g) });
 
     function nodeFromVinyl(file) {
         return {
@@ -41,7 +40,7 @@ module.exports = function (options) {
 
         function readTree(callback) {
             var stream = vfs.src(globs, {
-                base: base
+                cwd: base
             });
             var files = [];
             stream.on('data', function (file) {
