@@ -51,7 +51,9 @@ module.exports = function (options) {
 
                     var success = jshint(node.data.toString('utf8'), config, globals);
                     if (!success) {
-                        Array.prototype.push.apply(result, jshint.errors.map(function (err) {
+                        Array.prototype.push.apply(result, jshint.errors.filter(function (err) {
+                            return err !== null;
+                        }).map(function (err) {
                             return {
                                 file: node.name,
                                 error: err
