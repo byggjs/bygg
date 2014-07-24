@@ -8,11 +8,11 @@ var vfs = require('vinyl-fs');
 module.exports = function (options) {
     var base = path.resolve(options.base);
 
-    var globs;
-    if (typeof options.globs === 'string') {
-        globs = [options.globs];
+    var src;
+    if (typeof options.src === 'string') {
+        src = [options.src];
     } else {
-        globs = options.globs;
+        src = options.src;
     }
 
     function nodeFromVinyl(file) {
@@ -39,7 +39,7 @@ module.exports = function (options) {
         }
 
         function readTree(callback) {
-            var stream = vfs.src(globs, {
+            var stream = vfs.src(src, {
                 cwd: base
             });
             var files = [];
