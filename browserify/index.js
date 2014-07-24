@@ -131,33 +131,25 @@ module.exports = function (options) {
 
                     firstPush = false;
 
+                    var source = Buffer.concat(buffers).toString('utf8');
                     var sourceMapData = null;
-                    var sourceMapBufferIndex = buffers.length;
-                    var sourceMapTrailerSize = 0;
-                    for (var i = buffers.length - 1; i >= 0; i--) {
-                        var buffer = buffers[i];
-                        sourceMapTrailerSize += buffer.length;
-                        var source = buffer.toString('utf8');
-                        if (source.substr(0, SOURCEMAPPINGURL_PREFIX.length) === SOURCEMAPPINGURL_PREFIX) {
-                            var originalSourceMap = JSON.parse(new Buffer(source.substr(SOURCEMAPPINGURL_PREFIX.length), 'base64').toString('utf8'));
-                            var modifiedSourceMap = fixupSourceMap(originalSourceMap);
-                            sourceMapData = new Buffer(JSON.stringify(modifiedSourceMap), 'utf8');
-                            sourceMapBufferIndex = i;
-                            break;
+                    var sourceMapUrlStart = source.lastIndexOf(SOURCEMAPPINGURL_PREFIX);
+                    if (sourceMapUrlStart !== -1) {
+                        var sourceMapUrlEnd = source.indexOf('\n', sourceMapUrlStart + SOURCEMAPPINGURL_PREFIX.length);
+                        if (sourceMapUrlEnd === -1) {
+                            sourceMapUrlEnd = source.length;
                         }
-                    }
-
-                    if (sourceMapData !== null) {
-                        totalLength -= sourceMapTrailerSize;
+                        var originalSourceMap = JSON.parse(new Buffer(source.substring(sourceMapUrlStart + SOURCEMAPPINGURL_PREFIX.length, sourceMapUrlEnd), 'base64').toString('utf8'));
+                        var modifiedSourceMap = fixupSourceMap(originalSourceMap);
+                        sourceMapData = new Buffer(JSON.stringify(modifiedSourceMap), 'utf8');
+                        source = source.substring(0, sourceMapUrlStart) + source.substring(sourceMapUrlEnd);
                     }
 
                     var outputNode = tree.cloneNode(node);
                     outputNode.name = path.dirname(node.name) + '/' + path.basename(node.name, path.extname(node.name)) + '.js';
-                    outputNode.data = Buffer.concat(buffers.slice(0, sourceMapBufferIndex), totalLength);
                     outputNode.metadata.mime = 'application/javascript';
                     if (sourceMapData !== null) {
-                        var sourceMapUrlTrailer = '\n//# sourceMappingURL=./' + path.basename(outputNode.name) + '.map';
-                        outputNode.data = Buffer.concat([outputNode.data, new Buffer(sourceMapUrlTrailer, 'utf8')]);
+                        source += '\n//# sourceMappingURL=./' + path.basename(outputNode.name) + '.map';
                         outputNode.metadata.sourceMap = outputNode.siblings.length;
                         outputNode.siblings.push({
                             name: outputNode.name + '.map',
@@ -165,6 +157,7 @@ module.exports = function (options) {
                             stat: node.stat
                         });
                     }
+                    outputNode.data = new Buffer(source, 'utf8');
 
                     var outputTree = new mix.Tree([outputNode]);
                     sink.push(outputTree);
