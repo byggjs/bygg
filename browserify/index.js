@@ -21,6 +21,9 @@ module.exports = function (options) {
     var configure = options.configure || function () {};
     delete options.configure;
 
+    var bundleOptions = options.bundle || {};
+    delete options.bundle;
+
     var changed = new mix.Stream(function (sink) {
         changedEventSink = sink;
     });
@@ -102,16 +105,16 @@ module.exports = function (options) {
             function pushBundle() {
                 var buffers = [];
                 var totalLength = 0;
-                var bundleOptions = {
+                var opts = mixIn({}, bundleOptions, {
                     includePackage: true,
                     packageCache: pkgCache,
                     debug: true
-                };
+                });
                 if (!firstPush) {
-                    bundleOptions.cache = depCache;
+                    opts.cache = depCache;
                 }
                 var start = new Date();
-                var output = b.bundle(bundleOptions);
+                var output = b.bundle(opts);
                 output.on('data', function (buffer) {
                     buffers.push(buffer);
                     totalLength += buffer.length;
