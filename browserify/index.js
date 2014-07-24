@@ -146,7 +146,11 @@ module.exports = function (options) {
                     }
 
                     var outputNode = tree.cloneNode(node);
-                    outputNode.name = path.dirname(node.name) + '/' + path.basename(node.name, path.extname(node.name)) + '.js';
+                    var outputPrefix = path.dirname(node.name) + '/';
+                    if (outputPrefix === './') {
+                        outputPrefix = '';
+                    }
+                    outputNode.name = outputPrefix + path.basename(node.name, path.extname(node.name)) + '.js';
                     outputNode.metadata.mime = 'application/javascript';
                     if (sourceMapData !== null) {
                         source += '\n//# sourceMappingURL=./' + path.basename(outputNode.name) + '.map';

@@ -55,9 +55,12 @@ module.exports = function (options) {
                             watcher.add(path);
                         });
 
-                        var target = path.dirname(node.name) + '/' + path.basename(node.name, path.extname(node.name)) + '.css';
                         var outputNode = tree.cloneNode(node);
-                        outputNode.name = target;
+                        var outputPrefix = path.dirname(node.name) + '/';
+                        if (outputPrefix === './') {
+                            outputPrefix = '';
+                        }
+                        outputNode.name = outputPrefix + path.basename(node.name, path.extname(node.name)) + '.css';
                         outputNode.data = new Buffer(css, 'utf8');
                         outputNode.metadata.mime = 'text/css';
                         sink.push(new mix.Tree([outputNode]));
