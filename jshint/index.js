@@ -8,7 +8,7 @@ var mixIn = require('mout/object/mixIn');
 var path = require('path');
 
 module.exports = function (options) {
-    options = mixIn({ browser: true }, options || {});
+    options = options || {};
 
     var rcLoader = new RcLoader('.jshintrc', options, {
         loader: function (path) {
