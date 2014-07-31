@@ -100,7 +100,7 @@ function resolveDependencies(nodes, nodeMap, stack) {
                 } else {
                     referencedPath = joinPath(dirName(node.name), reference);
                 }
-                var referencedEntry = nodeMap[referencedPath] || null;
+                var referencedEntry = nodeMap.hasOwnProperty(referencedPath) ? nodeMap[referencedPath] : null;
                 if (referencedEntry !== null) {
                     refs[reference] = referencedEntry.node;
                     Array.prototype.push.apply(deps, resolveDependencies([referencedEntry.node], nodeMap, stack));
