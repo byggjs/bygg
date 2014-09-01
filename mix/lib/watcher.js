@@ -4,6 +4,7 @@ var Emitter = require('prime/emitter');
 var Kefir = require('kefir');
 var chokidar = require('chokidar');
 var debounce = require('./debounce');
+var mixIn = require('mout/object/mixIn');
 var prime = require('prime');
 
 module.exports = prime({
@@ -22,14 +23,15 @@ module.exports = prime({
                 this._sink = null;
             }.bind(this);
         }, this).scan({}, function (files, update) {
+            var result = mixIn({}, files);
             var operation = update[0];
             var path = update[1];
             if (operation === '+') {
-                files[path] = true;
+                result[path] = true;
             } else {
-                delete files[path];
+                delete result[path];
             }
-            return files;
+            return result;
         }).flatMap(debounce(600)).skipDuplicates(function (previous, next) {
             return filesToString(previous) === filesToString(next);
         }).onValue(function (files) {
@@ -38,8 +40,13 @@ module.exports = prime({
             }
             if (watcher !== null) {
                 watcher.close();
+                watcher = null;
             }
-            watcher = chokidar.watch(Object.keys(files), {
+            var filePaths = Object.keys(files);
+            if (filePaths.length === 0) {
+                return;
+            }
+            watcher = chokidar.watch(filePaths, {
                 persistent: false
             });
             Kefir.fromBinder(function (sink) {
