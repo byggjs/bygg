@@ -34,11 +34,16 @@ function Stream(value) {
 Stream.prototype.pipe = function (sink) {
     this._consumers++;
     return new Stream(this._observable.flatMap(function (input) {
-        var output = sink(input);
-        if (output instanceof Stream) {
-            return output._observable;
+        if (input.nodes.length === 0) {
+            // pass through empty trees
+            return Kefir.once(input);
         } else {
-            return Kefir.once(output);
+            var output = sink(input);
+            if (output instanceof Stream) {
+                return output._observable;
+            } else {
+                return Kefir.once(output);
+            }
         }
     }));
 };
