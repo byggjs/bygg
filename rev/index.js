@@ -8,6 +8,9 @@ module.exports = function (options) {
     options = options || {};
 
     var entrypoint = options.entrypoint || 'index.html';
+    if (typeof entrypoint === 'string') {
+        entrypoint = [entrypoint];
+    }
 
     return function (tree) {
         var deps = resolveDependencies(tree.nodes);
@@ -27,7 +30,7 @@ module.exports = function (options) {
             var name = dep.node.name;
             var revision = md5(data).substr(0, 8);
             var extension = path.extname(name);
-            var revName = (name !== entrypoint) ? joinPath(dirName(name), path.basename(name, extension) + '-' + revision + extension) : name;
+            var revName = (entrypoint.indexOf(name) === -1) ? joinPath(dirName(name), path.basename(name, extension) + '-' + revision + extension) : name;
             var revNode = dep.siblingOf === null ? tree.cloneNode(dep.node) : tree.cloneSibling(dep.node, dep.siblingOf);
             revNode.name = revName;
             revNode.data = data;
