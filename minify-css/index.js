@@ -7,15 +7,17 @@ module.exports = function (options) {
     options = options || {};
 
     return function (tree) {
-        var start = new Date();
         var nodes = tree.nodes.map(function (node) {
+            var start = new Date();
             var input = node.data.toString('utf8');
             var output = new CleanCSS(options).minify(input);
             var outputNode = tree.cloneNode(node);
             outputNode.data = new Buffer(output, 'utf8');
+
+            mix.log('minify-css', 'Minified ' +  node.name, new Date() - start);
+
             return outputNode;
         });
-        console.log('minified CSS in ' + (new Date() - start) + ' ms');
         return new mix.Tree(nodes);
     };
 };

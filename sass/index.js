@@ -46,7 +46,7 @@ module.exports = function (options) {
                             return;
                         }
 
-                        console.log('generated CSS in ' + (new Date() - start) + ' ms');
+                        mix.log('sass', 'Compiled ' + node.name, new Date() - start);
 
                         depFiles = stats.includedFiles.filter(function (path) {
                             return path !== sassFile;
@@ -69,8 +69,7 @@ module.exports = function (options) {
                         if (disposed) {
                             return;
                         }
-
-                        console.log(error);
+                        mix.error('sass', error);
                     },
                     stats: stats
                 }));

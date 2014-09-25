@@ -22,8 +22,8 @@ module.exports = function (options) {
     }
 
     return function (tree) {
-        var start = new Date();
         var nodes = tree.nodes.map(function (node) {
+            var start = new Date();
             var source = node.data.toString('utf8');
 
             var ast = UglifyJS.parse(source, {
@@ -76,9 +76,10 @@ module.exports = function (options) {
                 };
             }
 
+            mix.log('uglify', 'Minified ' + node.name, new Date() - start);
+
             return outputNode;
         });
-        console.log('minified JS in ' + (new Date() - start) + ' ms');
         return new mix.Tree(nodes);
     };
 };

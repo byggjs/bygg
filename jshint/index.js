@@ -6,6 +6,7 @@ var jshintCli = require('jshint/src/cli');
 var jshintStylish = require(require('jshint-stylish'));
 var mixIn = require('mout/object/mixIn');
 var path = require('path');
+var mix = require('mix');
 
 module.exports = function (options) {
     options = options || {};
@@ -65,6 +66,7 @@ module.exports = function (options) {
                 }
 
                 if (--remaining === 0) {
+                    mix.log('jshint', '');
                     jshintStylish.reporter(result, {});
                 }
             });

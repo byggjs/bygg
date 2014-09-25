@@ -17,7 +17,6 @@ module.exports = function () {
             outputNode.data = new Buffer(result.css, 'utf8');
             return outputNode;
         });
-        console.log('autoprefixed CSS in ' + (new Date() - start) + ' ms');
         return new mix.Tree(nodes);
     };
 };

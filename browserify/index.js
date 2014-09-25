@@ -120,14 +120,14 @@ module.exports = function (options) {
                     totalLength += buffer.length;
                 });
                 output.on('error', function (error) {
-                    console.log(error);
+                    mix.error('browserify', error.message);
                 });
                 output.on('end', function () {
                     if (disposed) {
                         return;
                     }
 
-                    console.log('generated JS in ' + (new Date() - start) + ' ms');
+                    mix.log('browserify', 'Bundled ' + node.name, new Date() - start);
 
                     firstPush = false;
 
@@ -190,7 +190,7 @@ module.exports = function (options) {
                 disposed = true;
             };
         });
-    };
+    }
 
     Object.defineProperty(processTree, 'changed', { value: changed });
 

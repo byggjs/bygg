@@ -7,10 +7,13 @@ var mix = require('mix');
 var morgan = require('morgan');
 var parseurl = require('parseurl');
 var tinylr = require('tiny-lr');
+var chalk = require('chalk');
 
 var LIVERELOAD_PORT = 35729;
 
 module.exports = function (port, behavior) {
+    var receivedInitialTree = false;
+
     var tinylrServer = tinylr();
     tinylrServer.listen(LIVERELOAD_PORT);
 
@@ -23,7 +26,6 @@ module.exports = function (port, behavior) {
     }
     app.use(fileMiddleware('index.html'));
     app.listen(port);
-
     var currentTree = new mix.Tree([]);
 
     function staticMiddleware(req, res, next) {
@@ -48,7 +50,7 @@ module.exports = function (port, behavior) {
             } else {
                 next();
             }
-        }
+        };
     }
 
     function getNodeData(name, callback) {
@@ -65,6 +67,16 @@ module.exports = function (port, behavior) {
         tree.nodes.forEach(function (node) {
             tinylr.changed('/' + node.name);
         });
+
+        var message;
+        if (!receivedInitialTree) {
+            receivedInitialTree = true;
+            message = 'Server started on port ' + chalk.yellow(port);
+        } else {
+            message = 'Triggered LiveReload';
+        }
+        mix.log('serve', message);
+
         return tree;
     };
 };

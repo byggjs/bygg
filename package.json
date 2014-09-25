@@ -29,6 +29,7 @@
     "mime": "1.2.11",
     "morgan": "1.1.1",
     "mout": "0.9.1",
+    "node-notifier": "^3.4.1",
     "node-sass": "0.9.3",
     "parseurl": "1.0.1",
     "pretty-bytes": "0.1.1",
