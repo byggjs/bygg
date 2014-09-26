@@ -4,6 +4,7 @@ var mix = require('mix');
 var mixIn = require('mout/object/mixIn');
 var path = require('path');
 var sass = require('node-sass');
+var fs = require('fs');
 
 module.exports = function (options) {
     var currentSink = null;
@@ -41,13 +42,13 @@ module.exports = function (options) {
                 var start = new Date();
                 sass.render(mixIn({}, options, {
                     file: sassFile,
+                    sourceComments: 'map',
+                    stats: stats,
+                    sourceMap: '#SOURCE_MAP#',
                     success: function (css) {
                         if (disposed) {
                             return;
                         }
-
-                        mix.log('sass', 'Compiled ' + node.name, new Date() - start);
-
                         depFiles = stats.includedFiles.filter(function (path) {
                             return path !== sassFile;
                         });
@@ -61,17 +62,35 @@ module.exports = function (options) {
                             outputPrefix = '';
                         }
                         outputNode.name = outputPrefix + path.basename(node.name, path.extname(node.name)) + '.css';
-                        outputNode.data = new Buffer(css, 'utf8');
                         outputNode.metadata.mime = 'text/css';
+
+                        // Process source map
+                        var sourceMapData = JSON.parse(stats.sourceMap);
+                        sourceMapData.sourcesContent = [];
+
+                        sourceMapData.sources = sourceMapData.sources.map(function (source) {
+                            sourceMapData.sourcesContent.push(fs.readFileSync(source, {encoding: 'utf-8'}));
+                            return path.relative(node.base, source);
+                        });
+                        outputNode.metadata.sourceMap = outputNode.siblings.length;
+                        outputNode.siblings.push({
+                            name: outputNode.name + '.map',
+                            data: new Buffer(JSON.stringify(sourceMapData), 'utf-8')
+                        });
+
+                        css = css.replace('#SOURCE_MAP#', './' + path.basename(outputNode.name) + '.map');
+                        outputNode.data = new Buffer(css, 'utf8');
+
                         sink.push(new mix.Tree([outputNode]));
+
+                        mix.log('sass', 'Compiled ' + outputNode.name, new Date() - start);
                     },
                     error: function (error) {
                         if (disposed) {
                             return;
                         }
                         mix.error('sass', error);
-                    },
-                    stats: stats
+                    }
                 }));
             }
 
