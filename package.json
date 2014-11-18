@@ -14,7 +14,7 @@
     "url": "git://github.com/soundrop/mix"
   },
   "dependencies": {
-    "autoprefixer": "2.1.0",
+    "autoprefixer-core": "^4.0.0",
     "browserify": "4.2.0",
     "chalk": "0.5.1",
     "chokidar": "0.8.2",
@@ -28,7 +28,7 @@
     "mime": "1.2.11",
     "morgan": "1.1.1",
     "mout": "0.9.1",
-    "node-notifier": "^3.4.1",
+    "node-notifier": "^4.0.2",
     "node-sass": "0.9.3",
     "parseurl": "1.0.1",
     "pretty-bytes": "0.1.1",

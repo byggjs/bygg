@@ -2,13 +2,11 @@
 
 var Kefir = require('kefir');
 var chalk = require('chalk');
-var Notification = require('node-notifier');
+var notifier = require('node-notifier');
 
 var Stream = require('./lib/stream');
 var Tree = require('./lib/tree');
 var Watcher = require('./lib/watcher');
-
-var notifier = new Notification();
 
 function combine() {
     var streams = Array.prototype.slice.call(arguments);

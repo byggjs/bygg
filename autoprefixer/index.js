@@ -1,6 +1,6 @@
 'use strict';
 
-var autoprefixer = require('autoprefixer');
+var autoprefixer = require('autoprefixer-core');
 var mix = require('mix');
 var path = require('path');
 
