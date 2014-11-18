@@ -26,7 +26,7 @@ module.exports = function (port, behavior) {
     }
     app.use(fileMiddleware('index.html'));
     app.listen(port);
-    var currentTree = new mix.Tree([]);
+    var currentTree = mix.tree([]);
 
     function staticMiddleware(req, res, next) {
         var pathname = parseurl(req).pathname;
@@ -75,7 +75,7 @@ module.exports = function (port, behavior) {
         } else {
             message = 'Triggered LiveReload';
         }
-        mix.log('serve', message);
+        mix.logger.log('serve', message);
 
         return tree;
     };

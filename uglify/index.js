@@ -76,10 +76,11 @@ module.exports = function (options) {
                 };
             }
 
-            mix.log('uglify', 'Minified ' + node.name, new Date() - start);
+            mix.logger.log('uglify', 'Minified ' + node.name, new Date() - start);
 
             return outputNode;
         });
-        return new mix.Tree(nodes);
+
+        return mix.tree(nodes);
     };
 };

@@ -39,6 +39,7 @@ module.exports = function () {
 
             return outputNode;
         });
-        return new mix.Tree(nodes);
+
+        return mix.tree(nodes);
     };
 };

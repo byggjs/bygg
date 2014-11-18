@@ -7,6 +7,7 @@ var path = require('path');
 module.exports = function (options) {
     options = options || {};
 
+    // TODO: allow globs
     var entrypoint = options.entrypoint || 'index.html';
     if (typeof entrypoint === 'string') {
         entrypoint = [entrypoint];
@@ -57,7 +58,7 @@ module.exports = function (options) {
 
         nodes.reverse();
 
-        return new mix.Tree(nodes);
+        return mix.tree(nodes);
     };
 };
 

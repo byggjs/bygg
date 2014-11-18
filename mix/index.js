@@ -1,40 +1,23 @@
 'use strict';
 
-var Kefir = require('kefir');
-var chalk = require('chalk');
-var notifier = require('node-notifier');
+var mixIn = require('mout/object/mixIn');
 
-var Stream = require('./lib/stream');
-var Tree = require('./lib/tree');
-var Watcher = require('./lib/watcher');
+var signal = require('./lib/signal');
+var tree = require('./lib/tree');
+var watcher = require('./lib/watcher');
+var logger = require('./lib/logger');
 
-function combine() {
-    var streams = Array.prototype.slice.call(arguments);
-    streams.forEach(function (stream) {
-        stream._consumers++;
-    });
-    var observables = streams.map(function (stream) { return stream._observable; });
-    return new Stream(Kefir.combine(observables, Tree.merge));
-}
-
-function log (plugin, message, time) {
-    var loggedTime = (time !== undefined) ? chalk.yellow('(' + time + 'ms)') : '';
-    console.log(chalk.green('[' + plugin + ']'), message, loggedTime);
-}
-
-function error (plugin, message) {
-    console.log(chalk.red('[' + plugin + ']'), message);
-    notifier.notify({
-        title: plugin + ' error',
-        message: message
-    });
-}
+var combineTrees = function (/* ...signals */) {
+    var args = Array.prototype.slice.call(arguments);
+    var combinator = tree.merge;
+    args.unshift(combinator);
+    return signal.combine.apply(null, args);
+};
 
 module.exports = {
-    log: log,
-    error: error,
-    combine: combine,
-    Stream: Stream,
-    Tree: Tree,
-    Watcher: Watcher
+    combine: combineTrees,
+    logger: logger,
+    signal: signal,
+    watcher: watcher,
+    tree: tree
 };

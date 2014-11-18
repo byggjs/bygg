@@ -14,10 +14,11 @@ module.exports = function (options) {
             var outputNode = tree.cloneNode(node);
             outputNode.data = new Buffer(output, 'utf8');
 
-            mix.log('minify-css', 'Minified ' +  node.name, new Date() - start);
+            mix.logger.log('minify-css', 'Minified ' +  node.name, new Date() - start);
 
             return outputNode;
         });
-        return new mix.Tree(nodes);
+
+        return mix.tree(nodes);
     };
 };

@@ -17,6 +17,6 @@ module.exports = function (options) {
             return node;
         });
 
-        return new mix.Tree(nodes);
+        return mix.tree(nodes);
     };
 };

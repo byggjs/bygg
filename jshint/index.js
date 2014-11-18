@@ -66,7 +66,7 @@ module.exports = function (options) {
                 }
 
                 if (--remaining === 0) {
-                    mix.log('jshint', '');
+                    mix.logger.log('jshint', '');
                     jshintStylish.reporter(result, {});
                 }
             });

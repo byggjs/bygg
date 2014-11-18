@@ -3,8 +3,6 @@
 var mixIn = require('mout/object/mixIn');
 var path = require('path');
 
-module.exports = Tree;
-
 function Tree(nodes) {
     this.nodes = nodes;
 }
@@ -55,6 +53,10 @@ Tree.prototype.findNode = function (predicate) {
     return null;
 };
 
+Tree.create = function (nodes) {
+    return new Tree(nodes);
+};
+
 Tree.merge = function () {
     var result = new Tree([]);
     for (var i = 0; i !== arguments.length; i++) {
@@ -63,3 +65,6 @@ Tree.merge = function () {
     }
     return result;
 };
+
+module.exports = Tree.create;
+module.exports.merge = Tree.merge;
