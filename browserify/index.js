@@ -48,7 +48,6 @@ module.exports = function (options) {
             b.bundle(function (err, buf) {
                 if (err) { mix.logger.error('browserify', err.message); return; }
 
-                mix.logger.log('browserify', 'Bundled ' + node.name, new Date() - start);
                 watcher.watch(Object.keys(depCache).map(function (depId) {
                     return depCache[depId].file;
                 }));
@@ -73,6 +72,8 @@ module.exports = function (options) {
                     return (source[0] === '/') ? path.relative(node.base, source) : source;
                 });
                 mix.tree.sourceMap.set(outputNode, sourceMap);
+
+                mix.logger.log('browserify', 'Bundled ' + node.name, new Date() - start);
 
                 signal.push(mix.tree([outputNode]));
             });

@@ -54,9 +54,9 @@ module.exports = function (options) {
                     });
                     mix.tree.sourceMap.set(outputNode, sourceMap);
 
-                    signal.push(mix.tree([outputNode]));
-
                     mix.logger.log('sass', 'Compiled ' + outputNode.name, new Date() - start);
+
+                    signal.push(mix.tree([outputNode]));
                 },
                 error: function (error) {
                     mix.logger.error('sass', error);
