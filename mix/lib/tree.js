@@ -64,7 +64,7 @@ SourceMap.get = function (node) {
 };
 
 SourceMap.name = function (node) {
-    return path.join('.', path.basename(node.name)) + '.map';
+    return path.basename(node.name) + '.map';
 };
 
 SourceMap.set = function (node, sourceMap) {
@@ -85,7 +85,13 @@ SourceMap.set = function (node, sourceMap) {
             });
         }
 
-        var annotation = new Buffer('\n/*# sourceMappingURL=' + SourceMap.name(node) + ' */', 'utf-8');
+        var annotation;
+        if (node.metadata.mime === 'application/javascript') {
+            annotation = new Buffer('\n//# sourceMappingURL=' + SourceMap.name(node), 'utf-8');
+        } else if (node.metadata.mime === 'text/css') {
+            annotation = new Buffer('\n/*# sourceMappingURL=' + SourceMap.name(node) +'*/', 'utf-8');
+        }
+
         node.data = Buffer.concat([node.data, annotation]);
 
         node.metadata.sourceMap = node.siblings.length;
