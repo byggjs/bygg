@@ -68,6 +68,12 @@ SourceMap.name = function (node) {
 };
 
 SourceMap.set = function (node, sourceMap) {
+    var basedir = path.dirname(node.name);
+
+    sourceMap.sources = sourceMap.sources.map(function (source) {
+        return path.relative(basedir, source);
+    });
+
     if (node.metadata.sourceMap !== undefined) {
         var sibling = Tree.prototype.cloneSibling(node.siblings[node.metadata.sourceMap], node);
         sibling.data = new Buffer(JSON.stringify(sourceMap), 'utf-8');
@@ -75,14 +81,9 @@ SourceMap.set = function (node, sourceMap) {
     } else {
         if (sourceMap.sourcesContent === undefined || sourceMap.sourcesContent.length === 0) {
             sourceMap.sourcesContent = sourceMap.sources.map(function (source) {
-                return fs.readFileSync(path.join(node.base, source), {encoding: 'utf-8'});
+                return fs.readFileSync(path.join(node.base, basedir, source), {encoding: 'utf-8'});
             });
         }
-
-        var basedir = path.dirname(node.name);
-        sourceMap.sources = sourceMap.sources.map(function (source) {
-            return path.relative(basedir, source);
-        });
 
         var annotation = new Buffer('\n/*# sourceMappingURL=' + SourceMap.name(node) + ' */', 'utf-8');
         node.data = Buffer.concat([node.data, annotation]);
