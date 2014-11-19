@@ -63,25 +63,16 @@ module.exports = function (options) {
 
                 // Bundle
                 var outputBundle = convertSourceMap.removeComments(bundle);
-                outputBundle += '\n//# sourceMappingURL=./' + path.basename(outputNode.name) + '.map';
                 outputNode.name = outputPrefix + path.basename(node.name, path.extname(node.name)) + '.js';
                 outputNode.metadata.mime = 'application/javascript';
                 outputNode.data = new Buffer(outputBundle, 'utf-8');
 
                 // Source map
-                var sourceMap = convertSourceMap.fromSource(bundle);
-                var sourcePrefix = path.resolve(node.base, outputPrefix);
-                sourceMap.setProperty('sources', sourceMap.getProperty('sources').map(function (source){
-                    return source[0] === '/' ?
-                        path.relative(sourcePrefix, source) :
-                        path.relative(outputPrefix, source);
-                }));
-                outputNode.metadata.sourceMap = outputNode.siblings.length;
-                outputNode.siblings.push({
-                    name: outputNode.name + '.map',
-                    data: new Buffer(sourceMap.toJSON(), 'utf-8'),
-                    stat: node.stat
+                var sourceMap = convertSourceMap.fromSource(bundle).toObject();
+                sourceMap.sources = sourceMap.sources.map(function (source) {
+                    return (source[0] === '/') ? path.relative(node.base, source) : source;
                 });
+                mix.tree.sourceMap.set(outputNode, sourceMap);
 
                 signal.push(mix.tree([outputNode]));
             });

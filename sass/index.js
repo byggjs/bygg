@@ -11,13 +11,12 @@ module.exports = function (options) {
 
     return function (tree) {
         if (watcher !== undefined) {
-            watcher.dispose();
+            watcher.close();
         }
 
         if (tree.nodes.length !== 1) {
             throw new Error('Exactly one scss file must be specified');
         }
-
 
         var node = tree.nodes[0];
         var signal = mix.signal();
@@ -31,9 +30,9 @@ module.exports = function (options) {
 
             sass.render(mixIn({}, options, {
                 file: sassFile,
-                sourceComments: 'map',
                 stats: stats,
-                sourceMap: '#SOURCE_MAP#',
+                sourceMap: '_.map',
+                omitSourceMapUrl: true,
                 success: function (css) {
                     deps = stats.includedFiles.filter(function (path) {
                         return path !== sassFile;
@@ -47,24 +46,13 @@ module.exports = function (options) {
                     }
                     outputNode.name = outputPrefix + path.basename(node.name, path.extname(node.name)) + '.css';
                     outputNode.metadata.mime = 'text/css';
-
-                    // Process source map
-                    var sourceMapData = JSON.parse(stats.sourceMap);
-                    sourceMapData.sourcesContent = [];
-
-                    var sourcePrefix = path.join(node.base, outputPrefix);
-                    sourceMapData.sources = sourceMapData.sources.map(function (source) {
-                        sourceMapData.sourcesContent.push(fs.readFileSync(source, {encoding: 'utf-8'}));
-                        return path.relative(sourcePrefix, source);
-                    });
-                    outputNode.metadata.sourceMap = outputNode.siblings.length;
-                    outputNode.siblings.push({
-                        name: outputNode.name + '.map',
-                        data: new Buffer(JSON.stringify(sourceMapData), 'utf-8')
-                    });
-
-                    css = css.replace('#SOURCE_MAP#', './' + path.basename(outputNode.name) + '.map');
                     outputNode.data = new Buffer(css, 'utf8');
+
+                    var sourceMap = JSON.parse(stats.sourceMap);
+                    sourceMap.sources = sourceMap.sources.map(function (source) {
+                        return path.relative(node.base, source);
+                    });
+                    mix.tree.sourceMap.set(outputNode, sourceMap);
 
                     signal.push(mix.tree([outputNode]));
 

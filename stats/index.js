@@ -18,7 +18,7 @@ module.exports = function (options) {
         var gzTotalSize = 0;
         var remaining = tree.nodes.length;
 
-        mix.log('stats', '');
+        mix.logger.log('stats', '');
         tree.nodes.forEach(function (node, i) {
             result.push(null);
 

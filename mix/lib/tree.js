@@ -2,6 +2,7 @@
 
 var mixIn = require('mout/object/mixIn');
 var path = require('path');
+var fs = require('fs');
 
 function Tree(nodes) {
     this.nodes = nodes;
@@ -53,6 +54,47 @@ Tree.prototype.findNode = function (predicate) {
     return null;
 };
 
+var SourceMap = {};
+SourceMap.get = function (node) {
+    if (node.metadata.sourceMap !== undefined) {
+        return node.siblings[node.metadata.sourceMap];
+    } else {
+        return undefined;
+    }
+};
+
+SourceMap.name = function (node) {
+    return path.join('.', path.basename(node.name)) + '.map';
+};
+
+SourceMap.set = function (node, sourceMap) {
+    if (node.metadata.sourceMap !== undefined) {
+        var sibling = Tree.prototype.cloneSibling(node.siblings[node.metadata.sourceMap], node);
+        sibling.data = new Buffer(JSON.stringify(sourceMap), 'utf-8');
+        node.siblings[node.metadata.sourceMap] = sibling;
+    } else {
+        if (sourceMap.sourcesContent === undefined || sourceMap.sourcesContent.length === 0) {
+            sourceMap.sourcesContent = sourceMap.sources.map(function (source) {
+                return fs.readFileSync(path.join(node.base, source), {encoding: 'utf-8'});
+            });
+        }
+
+        var basedir = path.dirname(node.name);
+        sourceMap.sources = sourceMap.sources.map(function (source) {
+            return path.relative(basedir, source);
+        });
+
+        var annotation = new Buffer('\n/*# sourceMappingURL=' + SourceMap.name(node) + ' */', 'utf-8');
+        node.data = Buffer.concat([node.data, annotation]);
+
+        node.metadata.sourceMap = node.siblings.length;
+        node.siblings.push({
+            name: path.join(basedir, SourceMap.name(node)),
+            data: new Buffer(JSON.stringify(sourceMap), 'utf-8')
+        });
+    }
+};
+
 Tree.create = function (nodes) {
     return new Tree(nodes);
 };
@@ -68,3 +110,4 @@ Tree.merge = function () {
 
 module.exports = Tree.create;
 module.exports.merge = Tree.merge;
+module.exports.sourceMap = SourceMap;

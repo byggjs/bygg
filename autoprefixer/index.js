@@ -14,28 +14,23 @@ module.exports = function () {
         var nodes = tree.nodes.map(function (node) {
             var input = node.data.toString('utf8');
 
-            var opts;
-            var sourceMap = null;
-            if (node.metadata.hasOwnProperty('sourceMap')) {
-                sourceMap = node.siblings[node.metadata.sourceMap];
-                opts = {
-                    from: node.name,
-                    map: {
-                        from: sourceMap.name,
-                        prev: sourceMap.data.toString('utf-8'),
-                        annotation: './' + path.basename(sourceMap.name)
-                    }
-                };
-            }
+            var prevSourceMap = node.siblings[node.metadata.sourceMap];
+            var opts = {
+                from: node.name,
+                map: {
+                    prev: prevSourceMap !== undefined ? prevSourceMap.data.toString('utf-8') : false,
+                    sourcesContent: true,
+                    annotation: false
+                }
+            };
 
             var result = autoprefixer.call(constraints).process(input, opts);
 
             var outputNode = tree.cloneNode(node);
             outputNode.data = new Buffer(result.css, 'utf8');
 
-            if (sourceMap !== null) {
-                sourceMap.data = new Buffer(result.map.toString(), 'utf-8');
-            }
+            var sourceMap = JSON.parse(result.map);
+            mix.tree.sourceMap.set(outputNode, sourceMap);
 
             return outputNode;
         });
