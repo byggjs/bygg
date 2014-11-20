@@ -1,8 +1,8 @@
 'use strict';
 
 var crypto = require('crypto');
-var mix = require('mix');
 var path = require('path');
+var mixlib = require('../lib');
 
 module.exports = function (options) {
     options = options || {};
@@ -58,7 +58,7 @@ module.exports = function (options) {
 
         nodes.reverse();
 
-        return mix.tree(nodes);
+        return mixlib.tree(nodes);
     };
 };
 

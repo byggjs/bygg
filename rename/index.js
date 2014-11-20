@@ -1,6 +1,6 @@
 'use strict';
 
-var mix = require('mix');
+var mix = require('../lib');
 
 var SOURCEMAPPINGURL_PREFIX = '\n//# sourceMappingURL=';
 
@@ -35,6 +35,6 @@ module.exports = function (from, to) {
             return outputNode;
         });
 
-        return new mix.tree(nodes);
+        return new mixlib.tree(nodes);
     };
 };

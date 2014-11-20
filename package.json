@@ -1,14 +1,13 @@
 {
   "name": "mix",
   "description": "Streaming build system",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "author": {
     "name": "Ole André Vadla Ravnås",
     "email": "ole.andre.ravnas@soundrop.com",
     "url": "http://www.soundrop.fm/"
   },
   "private": true,
-  "main": "mix/index.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/soundrop/mix"
@@ -18,7 +17,6 @@
     "browserify": "^6.3.2",
     "chalk": "^0.5.1",
     "chokidar": "^0.9.0",
-    "clean-css": "^2.2.18",
     "connect-livereload": "^0.5.0",
     "convert-source-map": "^0.4.1",
     "csswring": "^1.3.1",
@@ -43,5 +41,6 @@
   },
   "engines": {
     "node": ">= 0.10"
-  }
+  },
+  "main": "index.js"
 }

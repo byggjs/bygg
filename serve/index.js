@@ -3,11 +3,11 @@
 var express = require('express');
 var http = require('http');
 var livereload = require('connect-livereload');
-var mix = require('mix');
 var morgan = require('morgan');
 var parseurl = require('parseurl');
 var tinylr = require('tiny-lr');
 var chalk = require('chalk');
+var mixlib = require('../lib');
 
 var LIVERELOAD_PORT = 35729;
 
@@ -26,7 +26,7 @@ module.exports = function (port, behavior) {
     }
     app.use(fileMiddleware('index.html'));
     app.listen(port);
-    var currentTree = mix.tree([]);
+    var currentTree = mixlib.tree([]);
 
     function staticMiddleware(req, res, next) {
         var pathname = parseurl(req).pathname;
@@ -79,7 +79,7 @@ module.exports = function (port, behavior) {
 
         currentTree = tree;
 
-        mix.logger.log('serve', message);
+        mixlib.logger.log('serve', message);
 
         return tree;
     };

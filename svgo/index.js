@@ -1,14 +1,14 @@
 'use strict';
 
-var mix = require('mix');
 var SVGO = require('svgo');
+var mixlib = require('../lib');
 
 module.exports = function (options) {
     options = options || {};
 
     return function (tree) {
         var svgo = new SVGO(options);
-        var signal = mix.signal();
+        var signal = mixlib.signal();
         var nodes = [];
         var processed = 0;
 
@@ -18,7 +18,7 @@ module.exports = function (options) {
             svgo.optimize(input, function(result) {
                 if (result.error) {
                     processed++;
-                    mix.logger.error('svgo', result.error);
+                    mixlib.logger.error('svgo', result.error);
                     return;
                 }
 
@@ -28,8 +28,8 @@ module.exports = function (options) {
                 processed++;
 
                 if (processed === tree.nodes.length) {
-                    mix.logger.log('svgo', 'Minified ' + tree.nodes.length + ' SVG files');
-                    signal.push(mix.tree(nodes));
+                    mixlib.logger.log('svgo', 'Minified ' + tree.nodes.length + ' SVG files');
+                    signal.push(mixlib.tree(nodes));
                 }
             });
         });

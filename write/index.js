@@ -1,10 +1,10 @@
 'use strict';
 
 var File = require('vinyl');
-var mix = require('mix');
 var path = require('path');
 var rimraf = require('rimraf');
 var vfs = require('vinyl-fs');
+var mixlib = require('../lib');
 
 module.exports = function (dir) {
     var pending = [];
@@ -47,12 +47,12 @@ module.exports = function (dir) {
     }
 
     return function (tree) {
-        var signal = mix.signal();
+        var signal = mixlib.signal();
 
         schedule(function (done) {
             rimraf(dir, function (error) {
                 if (error) {
-                    mix.logger.error('write', error);
+                    mixlib.logger.error('write', error);
                     done();
                 }
 
@@ -68,7 +68,7 @@ module.exports = function (dir) {
                     done();
                 });
                 stream.on('error', function (error) {
-                    mix.logger.error('write', error);
+                    mixlib.logger.error('write', error);
                     done();
                 });
             });

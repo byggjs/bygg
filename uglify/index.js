@@ -1,10 +1,10 @@
 'use strict';
 
 var UglifyJS = require('uglify-js');
-var mix = require('mix');
 var mixIn = require('mout/object/mixIn');
 var path = require('path');
 var fs = require('fs');
+var mixlib = require('../lib');
 
 module.exports = function (options) {
     options = mixIn({
@@ -46,7 +46,7 @@ module.exports = function (options) {
                 ast.mangle_names(options.mangle);
             }
 
-            var prevSourceMap = mix.tree.sourceMap.get(node);
+            var prevSourceMap = mixlib.tree.sourceMap.get(node);
             var sourceMap = UglifyJS.SourceMap({
                 orig: prevSourceMap !== undefined ? prevSourceMap.data.toString('utf-8') : false,
                 root: options.sourceRoot
@@ -60,16 +60,16 @@ module.exports = function (options) {
             outputNode.data = new Buffer(outputSource, 'utf8');
 
             var sourceMapData = JSON.parse(sourceMap.toString());
-            mix.tree.sourceMap.set(outputNode, sourceMapData, {
+            mixlib.tree.sourceMap.set(outputNode, sourceMapData, {
                 annotate: true,
                 sourceBase: prevSourceMap === undefined ? path.dirname(node.name) : undefined
             });
 
-            mix.logger.log('uglify', 'Minified ' + node.name, new Date() - start);
+            mixlib.logger.log('uglify', 'Minified ' + node.name, new Date() - start);
 
             return outputNode;
         });
 
-        return mix.tree(nodes);
+        return mixlib.tree(nodes);
     };
 };

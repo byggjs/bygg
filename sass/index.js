@@ -1,10 +1,10 @@
 'use strict';
 
-var mix = require('mix');
 var mixIn = require('mout/object/mixIn');
 var path = require('path');
 var sass = require('node-sass');
 var fs = require('fs');
+var mixlib = require('../lib');
 
 module.exports = function (options) {
     var watcher;
@@ -19,8 +19,8 @@ module.exports = function (options) {
         }
 
         var node = tree.nodes[0];
-        var signal = mix.signal();
-        watcher = mix.watcher();
+        var signal = mixlib.signal();
+        watcher = mixlib.watcher();
         var deps = [];
 
         var pushCss = function () {
@@ -49,14 +49,14 @@ module.exports = function (options) {
                     outputNode.data = new Buffer(css, 'utf8');
 
                     var sourceMap = JSON.parse(stats.sourceMap);
-                    mix.tree.sourceMap.set(outputNode, sourceMap, { sourceBase: path.join(node.base, outputPrefix) });
+                    mixlib.tree.sourceMap.set(outputNode, sourceMap, { sourceBase: path.join(node.base, outputPrefix) });
 
-                    mix.logger.log('sass', 'Compiled ' + outputNode.name, new Date() - start);
+                    mixlib.logger.log('sass', 'Compiled ' + outputNode.name, new Date() - start);
 
-                    signal.push(mix.tree([outputNode]));
+                    signal.push(mixlib.tree([outputNode]));
                 },
                 error: function (error) {
-                    mix.logger.error('sass', error);
+                    mixlib.logger.error('sass', error);
                 }
             }));
         };

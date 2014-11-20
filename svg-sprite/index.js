@@ -1,7 +1,7 @@
 'use strict';
 
 var path = require('path');
-var mix = require('mix');
+var mixlib = require('../lib');
 
 var SVG_WRAPPER = '<svg xmlns="http://www.w3.org/2000/svg">#shapes#</svg>';
 
@@ -32,9 +32,9 @@ module.exports = function (options) {
         var sprite = SVG_WRAPPER.replace('#shapes#', symbols);
         var fileName = options.dest || 'svg-sprite.svg';
 
-        mix.logger.log('svg-sprite', 'Combined ' + tree.nodes.length + ' symbols into ' + fileName);
+        mixlib.logger.log('svg-sprite', 'Combined ' + tree.nodes.length + ' symbols into ' + fileName);
 
-        return mix.tree([{
+        return mixlib.tree([{
             base: path.dirname(fileName),
             name: fileName,
             data: new Buffer(sprite, 'utf8'),

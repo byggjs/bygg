@@ -1,16 +1,16 @@
 'use strict';
 
 var mime = require('mime');
-var mix = require('mix');
 var path = require('path');
 var vfs = require('vinyl-fs');
+var mixlib = require('../lib');
 
 module.exports = function (options) {
     var base = path.resolve(options.base);
     var src = (typeof options.src === 'string') ? [options.src] : options.src;
 
-    var watcher = mix.watcher();
-    var signal = mix.signal();
+    var watcher = mixlib.watcher();
+    var signal = mixlib.signal();
 
     var nodeFromVinyl = function (file) {
         return {
@@ -37,7 +37,7 @@ module.exports = function (options) {
 
         stream.on('end', function () {
             watcher.watch(files.map(function (file) { return file.path; }));
-            signal.push(mix.tree(files.map(nodeFromVinyl)));
+            signal.push(mixlib.tree(files.map(nodeFromVinyl)));
         });
     };
 

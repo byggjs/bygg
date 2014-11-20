@@ -1,11 +1,11 @@
 'use strict';
 
 // Based on gulp-size by @sindresorhus
-var mix = require('mix');
 var chalk = require('chalk');
 var gzipSize = require('gzip-size');
 var mixIn = require('mout/object/mixIn');
 var prettyBytes = require('pretty-bytes');
+var mixlib = require('../lib');
 
 module.exports = function (options) {
     options = mixIn({
@@ -18,7 +18,7 @@ module.exports = function (options) {
         var gzTotalSize = 0;
         var remaining = tree.nodes.length;
 
-        mix.logger.log('stats', '');
+        mixlib.logger.log('stats', '');
         tree.nodes.forEach(function (node, i) {
             result.push(null);
 

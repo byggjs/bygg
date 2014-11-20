@@ -1,10 +1,10 @@
 'use strict';
 
 var browserify = require('browserify');
-var mix = require('mix');
 var mixIn = require('mout/object/mixIn');
 var path = require('path');
 var convertSourceMap = require('convert-source-map');
+var mixlib = require('../lib');
 
 module.exports = function (options) {
     var watcher;
@@ -26,8 +26,8 @@ module.exports = function (options) {
 
         var node = tree.nodes[0];
         var entrypoint = path.join(node.base, node.name);
-        var signal = mix.signal();
-        watcher = mix.watcher();
+        var signal = mixlib.signal();
+        watcher = mixlib.watcher();
 
         delete depCache[entrypoint];
 
@@ -45,7 +45,7 @@ module.exports = function (options) {
             var start = new Date();
 
             b.bundle(function (err, buf) {
-                if (err) { mix.logger.error('browserify', err.message); return; }
+                if (err) { mixlib.logger.error('browserify', err.message); return; }
 
                 resolveCachedDepsIds();
 
@@ -72,11 +72,11 @@ module.exports = function (options) {
                 sourceMap.sources = sourceMap.sources.map(function (source) {
                     return (source[0] === '/') ? path.relative(node.base, source) : source;
                 });
-                mix.tree.sourceMap.set(outputNode, sourceMap, { sourceBase: outputPrefix });
+                mixlib.tree.sourceMap.set(outputNode, sourceMap, { sourceBase: outputPrefix });
 
-                mix.logger.log('browserify', 'Bundled ' + node.name, new Date() - start);
+                mixlib.logger.log('browserify', 'Bundled ' + node.name, new Date() - start);
 
-                signal.push(mix.tree([outputNode]));
+                signal.push(mixlib.tree([outputNode]));
             });
         };
 
