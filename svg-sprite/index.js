@@ -32,6 +32,8 @@ module.exports = function (options) {
         var sprite = SVG_WRAPPER.replace('#shapes#', symbols);
         var fileName = options.dest || 'svg-sprite.svg';
 
+        mix.logger.log('svg-sprite', 'Combined ' + tree.nodes.length + ' symbols into ' + fileName);
+
         return mix.tree([{
             base: path.dirname(fileName),
             name: fileName,

@@ -28,6 +28,7 @@ module.exports = function (options) {
                 processed++;
 
                 if (processed === tree.nodes.length) {
+                    mix.logger.log('svgo', 'Minified ' + tree.nodes.length + ' SVG files');
                     signal.push(mix.tree(nodes));
                 }
             });
