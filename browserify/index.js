@@ -9,6 +9,7 @@ var convertSourceMap = require('convert-source-map');
 module.exports = function (options) {
     var watcher;
     var depCache = {};
+    var idCache = {};
 
     options = options || {};
     var configure = options.configure || function () {};
@@ -46,6 +47,8 @@ module.exports = function (options) {
             b.bundle(function (err, buf) {
                 if (err) { mix.logger.error('browserify', err.message); return; }
 
+                resolveCachedDepsIds();
+
                 watcher.watch(Object.keys(depCache).map(function (depId) {
                     return depCache[depId].file;
                 }));
@@ -77,13 +80,28 @@ module.exports = function (options) {
             });
         };
 
+        var resolveCachedDepsIds = function (){
+            Object.keys(depCache).forEach(function (file) {
+                var dep = depCache[file];
+                dep.deps = Object.keys(dep.deps).reduce(function (acc, subdep) {
+                    acc[subdep] = idCache[dep.deps[subdep]];
+                    return acc;
+                }, {});
+            });
+        };
+
         b.on('dep', function (dep) {
             if (dep.file !== entrypoint) {
-                depCache[dep.id] = dep;
+                depCache[dep.file] = dep;
+                idCache[dep.id] = dep.file;
             }
         });
 
         watcher.listen(function (paths) {
+            paths.forEach(function (path) {
+                delete depCache[path];
+            });
+
             pushBundle();
         });
 
