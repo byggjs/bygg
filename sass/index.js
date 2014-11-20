@@ -49,10 +49,7 @@ module.exports = function (options) {
                     outputNode.data = new Buffer(css, 'utf8');
 
                     var sourceMap = JSON.parse(stats.sourceMap);
-                    sourceMap.sources = sourceMap.sources.map(function (source) {
-                        return path.relative(node.base, source);
-                    });
-                    mix.tree.sourceMap.set(outputNode, sourceMap);
+                    mix.tree.sourceMap.set(outputNode, sourceMap, { sourceBase: path.join(node.base, outputPrefix) });
 
                     mix.logger.log('sass', 'Compiled ' + outputNode.name, new Date() - start);
 

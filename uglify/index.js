@@ -4,6 +4,7 @@ var UglifyJS = require('uglify-js');
 var mix = require('mix');
 var mixIn = require('mout/object/mixIn');
 var path = require('path');
+var fs = require('fs');
 
 module.exports = function (options) {
     options = mixIn({
@@ -27,7 +28,7 @@ module.exports = function (options) {
             var source = node.data.toString('utf8');
 
             var ast = UglifyJS.parse(source, {
-                filename: path.join(node.base, node.name),
+                filename: node.name,
                 toplevel: null
             });
 
@@ -45,36 +46,24 @@ module.exports = function (options) {
                 ast.mangle_names(options.mangle);
             }
 
-            var sourceMapNode = null;
-            var outputOptions = mixIn({}, options.output);
-            if (node.metadata.hasOwnProperty('sourceMap')) {
-                sourceMapNode = node.siblings[node.metadata.sourceMap];
-                var sourceMapBlob = sourceMapNode.data.toString('utf8');
-                outputOptions.source_map = UglifyJS.SourceMap({
-                    file: node.name,
-                    orig: sourceMapBlob,
-                    root: options.sourceRoot
-                });
-                var sourceMap = JSON.parse(sourceMapBlob);
-                var outputMap = outputOptions.source_map.get();
-                sourceMap.sources.forEach(function (source, i) {
-                    outputMap.setSourceContent(source, sourceMap.sourcesContent[i]);
-                });
-            }
+            var prevSourceMap = mix.tree.sourceMap.get(node);
+            var sourceMap = UglifyJS.SourceMap({
+                orig: prevSourceMap !== undefined ? prevSourceMap.data.toString('utf-8') : false,
+                root: options.sourceRoot
+            });
+            var outputOptions = mixIn({}, options.output, {
+                source_map: sourceMap
+            });
 
             var outputSource = ast.print_to_string(outputOptions);
-            if (sourceMapNode !== null) {
-                outputSource += '\n//# sourceMappingURL=./' + path.basename(sourceMapNode.name);
-            }
-
             var outputNode = tree.cloneNode(node);
             outputNode.data = new Buffer(outputSource, 'utf8');
-            if (sourceMapNode !== null) {
-                outputNode.siblings[node.metadata.sourceMap] = {
-                    name: sourceMapNode.name,
-                    data: new Buffer(outputOptions.source_map + '', 'utf8')
-                };
-            }
+
+            var sourceMapData = JSON.parse(sourceMap.toString());
+            mix.tree.sourceMap.set(outputNode, sourceMapData, {
+                annotate: true,
+                sourceBase: prevSourceMap === undefined ? path.dirname(node.name) : undefined
+            });
 
             mix.logger.log('uglify', 'Minified ' + node.name, new Date() - start);
 

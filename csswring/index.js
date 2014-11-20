@@ -10,7 +10,7 @@ module.exports = function (options) {
             var start = new Date();
             var input = node.data.toString('utf8');
 
-            var prevSourceMap = node.siblings[node.metadata.sourceMap];
+            var prevSourceMap = mix.tree.sourceMap.get(node);
             var opts = {
                 from: node.name,
                 map: {
@@ -26,7 +26,7 @@ module.exports = function (options) {
                 outputNode.data = new Buffer(result.css, 'utf8');
 
                 var sourceMap = JSON.parse(result.map);
-                mix.tree.sourceMap.set(outputNode, sourceMap);
+                mix.tree.sourceMap.set(outputNode, sourceMap, { sourceBase: path.dirname(node.name) });
 
                 mix.logger.log('csswring', 'Minified ' + node.name, new Date() - start);
                 return outputNode;

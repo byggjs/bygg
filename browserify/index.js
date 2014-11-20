@@ -8,7 +8,6 @@ var convertSourceMap = require('convert-source-map');
 
 module.exports = function (options) {
     var watcher;
-    var pkgCache = {};
     var depCache = {};
 
     options = options || {};
@@ -33,7 +32,6 @@ module.exports = function (options) {
 
         var bOpts = mixIn({}, options, {
             basedir: node.base,
-            packageCache: pkgCache,
             cache: depCache,
             debug: true
         });
@@ -71,17 +69,13 @@ module.exports = function (options) {
                 sourceMap.sources = sourceMap.sources.map(function (source) {
                     return (source[0] === '/') ? path.relative(node.base, source) : source;
                 });
-                mix.tree.sourceMap.set(outputNode, sourceMap);
+                mix.tree.sourceMap.set(outputNode, sourceMap, { sourceBase: outputPrefix });
 
                 mix.logger.log('browserify', 'Bundled ' + node.name, new Date() - start);
 
                 signal.push(mix.tree([outputNode]));
             });
         };
-
-        b.on('package', function (file, pkg) {
-            pkgCache[file] = pkg;
-        });
 
         b.on('dep', function (dep) {
             if (dep.file !== entrypoint) {

@@ -67,38 +67,46 @@ SourceMap.name = function (node) {
     return path.basename(node.name) + '.map';
 };
 
-SourceMap.set = function (node, sourceMap) {
+SourceMap.set = function (node, sourceMap, options) {
+    options.annotate = options.annotate || false;
+    options.sourceBase = options.sourceBase || false;
+
     var basedir = path.dirname(node.name);
 
-    sourceMap.sources = sourceMap.sources.map(function (source) {
-        return path.relative(basedir, source);
-    });
+    if (options.sourceBase) {
+        sourceMap.sources = sourceMap.sources.map(function (source) {
+            return path.relative(options.sourceBase, source);
+        });
+    }
+
+    if (sourceMap.sourcesContent === undefined || sourceMap.sourcesContent.length === 0) {
+        sourceMap.sourcesContent = sourceMap.sources.map(function (source) {
+            return fs.readFileSync(path.join(node.base, basedir, source), {encoding: 'utf-8'});
+        });
+    }
 
     if (node.metadata.sourceMap !== undefined) {
         var sibling = Tree.prototype.cloneSibling(node.siblings[node.metadata.sourceMap], node);
         sibling.data = new Buffer(JSON.stringify(sourceMap), 'utf-8');
         node.siblings[node.metadata.sourceMap] = sibling;
     } else {
-        if (sourceMap.sourcesContent === undefined || sourceMap.sourcesContent.length === 0) {
-            sourceMap.sourcesContent = sourceMap.sources.map(function (source) {
-                return fs.readFileSync(path.join(node.base, basedir, source), {encoding: 'utf-8'});
-            });
-        }
+        node.metadata.sourceMap = node.siblings.length;
+        node.siblings.push({
+            name: path.join(basedir, SourceMap.name(node)),
+            data: new Buffer(JSON.stringify(sourceMap), 'utf-8')
+        });
 
+        options.annotate = true;
+    }
+
+    if (options.annotate) {
         var annotation;
         if (node.metadata.mime === 'application/javascript') {
             annotation = new Buffer('\n//# sourceMappingURL=' + SourceMap.name(node), 'utf-8');
         } else if (node.metadata.mime === 'text/css') {
             annotation = new Buffer('\n/*# sourceMappingURL=' + SourceMap.name(node) +'*/', 'utf-8');
         }
-
         node.data = Buffer.concat([node.data, annotation]);
-
-        node.metadata.sourceMap = node.siblings.length;
-        node.siblings.push({
-            name: path.join(basedir, SourceMap.name(node)),
-            data: new Buffer(JSON.stringify(sourceMap), 'utf-8')
-        });
     }
 };
 
