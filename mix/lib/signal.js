@@ -23,11 +23,12 @@ Signal.prototype.listen = function (listener) {
 
 Signal.prototype.pipe = function (fun) {
     var output = new Signal();
-    var prevResult;
+    var valueSignal;
 
     var mapValue = function (value) {
         var result = fun(value);
         if (result instanceof Signal) {
+            valueSignal = result;
             if (result.value !== undefined) {
                 output.push(result.value);
             }
@@ -37,7 +38,6 @@ Signal.prototype.pipe = function (fun) {
         } else {
             output.push(result);
         }
-        prevResult = result;
     };
 
     this.listen(mapValue);
