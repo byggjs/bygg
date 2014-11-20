@@ -63,18 +63,22 @@ module.exports = function (port, behavior) {
     }
 
     return function (tree) {
-        currentTree = tree;
-        tree.nodes.forEach(function (node) {
-            tinylr.changed('/' + node.name);
-        });
-
         var message;
         if (!receivedInitialTree) {
             receivedInitialTree = true;
             message = 'Server started on port ' + chalk.yellow(port);
         } else {
+            tree.nodes.forEach(function (node, i) {
+                if (currentTree.nodes[i] !== node) {
+                    tinylr.changed('/' + node.name);
+                }
+            });
+
             message = 'Triggered LiveReload';
         }
+
+        currentTree = tree;
+
         mix.logger.log('serve', message);
 
         return tree;
