@@ -93,7 +93,7 @@ function resolveDependencies(nodes, nodeMap, stack) {
         var siblingOf = nodeMap[node.name].siblingOf;
         if (siblingOf === null && !isBinary(node)) {
             var contents = node.data.toString('utf8');
-            var filepathRegex = /(?:\'|\"|\(|\/\/# sourceMappingURL=)([a-z0-9_@\-\/\.]{2,})/ig;
+            var filepathRegex = /(?:\'|\"|\(|(?:\/\/|\/*)# sourceMappingURL=)([a-z0-9_@\-\/\.]{2,})/ig;
             var match;
             while ((match = filepathRegex.exec(contents))) {
                 var reference = match[1];
