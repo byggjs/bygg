@@ -33,5 +33,8 @@ var combine = function (/* ...signals */) {
 
 module.exports = {
     task: task,
-    combine: combine
+    combine: combine,
+    files: require('./base/files'),
+    write: require('./base/write'),
+    noop: require('./base/noop')
 };
