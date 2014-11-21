@@ -28,7 +28,6 @@ module.exports = function (options) {
         var entrypoint = path.join(node.base, node.name);
         var signal = mixlib.signal();
         watcher = mixlib.watcher();
-
         delete depCache[entrypoint];
 
         var bOpts = mixIn({}, options, {
@@ -54,7 +53,8 @@ module.exports = function (options) {
                 }));
 
                 var outputNode = tree.cloneNode(node);
-                var outputPrefix = path.dirname(node.name) + '/';
+                var outputName = options.dest || node.name;
+                var outputPrefix = path.dirname(outputName) + '/';
                 if (outputPrefix === './') {
                     outputPrefix = '';
                 }
@@ -63,7 +63,7 @@ module.exports = function (options) {
 
                 // Bundle
                 var outputBundle = convertSourceMap.removeComments(bundle);
-                outputNode.name = outputPrefix + path.basename(node.name, path.extname(node.name)) + '.js';
+                outputNode.name = outputPrefix + path.basename(outputName, path.extname(outputName)) + '.js';
                 outputNode.metadata.mime = 'application/javascript';
                 outputNode.data = new Buffer(outputBundle, 'utf-8');
 
@@ -74,7 +74,7 @@ module.exports = function (options) {
                 });
                 mixlib.tree.sourceMap.set(outputNode, sourceMap, { sourceBase: outputPrefix });
 
-                mixlib.logger.log('browserify', 'Bundled ' + node.name, new Date() - start);
+                mixlib.logger.log('browserify', 'Bundled ' + outputName, new Date() - start);
 
                 signal.push(mixlib.tree([outputNode]));
             });
