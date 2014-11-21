@@ -6,8 +6,10 @@ var vfs = require('vinyl-fs');
 var mixlib = require('../lib');
 
 module.exports = function (options) {
-    var base = path.resolve(options.base);
+    options = (typeof options === 'string') ? { src: options } : options;
+
     var src = (typeof options.src === 'string') ? [options.src] : options.src;
+    var base = options.base !== undefined ? path.resolve(options.base) : process.cwd();
 
     var watcher = mixlib.watcher();
     var signal = mixlib.signal();
