@@ -1,46 +1,25 @@
 {
   "name": "mix",
   "description": "Streaming build system",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "author": {
     "name": "Ole André Vadla Ravnås",
     "email": "ole.andre.ravnas@soundrop.com",
     "url": "http://www.soundrop.fm/"
   },
-  "private": true,
-  "main": "mix/index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/soundrop/mix"
+    "url": "git+ssh://git@bitbucket.org:soundrop/mix.git"
   },
   "dependencies": {
-    "autoprefixer": "2.1.0",
-    "browserify": "4.2.0",
-    "chalk": "0.5.1",
-    "chokidar": "0.8.2",
-    "clean-css": "2.2.7",
-    "connect-livereload": "0.4.0",
-    "express": "4.5.1",
-    "gzip-size": "0.2.0",
-    "jshint": "2.5.2",
-    "jshint-stylish": "0.4.0",
-    "kefir": "0.1.12",
-    "mime": "1.2.11",
-    "morgan": "1.1.1",
-    "mout": "0.9.1",
-    "node-notifier": "^3.4.1",
-    "node-sass": "0.9.3",
-    "parseurl": "1.0.1",
-    "pretty-bytes": "0.1.1",
-    "prime": "0.4.2",
-    "rcloader": "0.1.2",
-    "rimraf": "2.2.8",
-    "tiny-lr": "0.1.1",
-    "uglify-js": "2.4.15",
-    "vinyl": "0.2.3",
-    "vinyl-fs": "0.3.4"
+    "liftoff": "^0.13.6",
+    "nomnom": "^1.8.1"
   },
   "engines": {
     "node": ">= 0.10"
-  }
+  },
+  "bin": {
+    "mix": "./bin/mix.js"
+  },
+  "main": "index.js"
 }
