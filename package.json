@@ -12,7 +12,12 @@
     "url": "git+ssh://git@bitbucket.org:soundrop/mix.git"
   },
   "dependencies": {
+    "chalk": "^0.5.1",
+    "chokidar": "^0.9.0",
+    "convert-source-map": "^0.4.1",
     "liftoff": "^0.13.6",
+    "mout": "^0.11.0",
+    "node-notifier": "^4.0.2",
     "nomnom": "^1.8.1"
   },
   "engines": {
