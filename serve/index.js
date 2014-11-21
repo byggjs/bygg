@@ -18,7 +18,7 @@ module.exports = function (port, behavior) {
     tinylrServer.listen(LIVERELOAD_PORT);
 
     var app = express()
-        // .use(morgan())
+        .use(morgan('dev'))
         .use(livereload({ port: LIVERELOAD_PORT }))
         .use(staticMiddleware);
     if (behavior) {
