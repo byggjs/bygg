@@ -9,7 +9,7 @@ var cli = new Liftoff({
     name: 'mix',
     moduleName: 'mix',
     configName: 'mixfile',
-    extensions: { '.js': null}
+    extensions: { '.js': null }
 });
 
 cli.launch({}, function (env) {
