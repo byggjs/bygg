@@ -1,9 +1,30 @@
 'use strict';
 
+var nomnom = require('nomnom');
+
 var signal = require('./lib/signal');
 var tree = require('./lib/tree');
 
-var combineTrees = function (/* ...signals */) {
+var task = function (name, callback, options) {
+    var command = nomnom.command(name);
+
+    options.forEach(function (option) {
+        command = command.option(option.name, {
+            abbr: option.abbr,
+            flag: option.flag,
+            default: option.default
+        });
+    });
+
+    command.callback(function (opts) {
+        var args = options.map(function (option) {
+            return opts[option.name];
+        });
+        callback.apply(null, args);
+    });
+};
+
+var combine = function (/* ...signals */) {
     var args = Array.prototype.slice.call(arguments);
     var combinator = tree.merge;
     args.unshift(combinator);
@@ -11,5 +32,6 @@ var combineTrees = function (/* ...signals */) {
 };
 
 module.exports = {
-    combine: combineTrees
+    task: task,
+    combine: combine
 };
