@@ -48,7 +48,7 @@ module.exports = function (options) {
 
             var prevSourceMap = mixlib.tree.sourceMap.get(node);
             var sourceMap = UglifyJS.SourceMap({
-                orig: prevSourceMap !== undefined ? prevSourceMap.data.toString('utf-8') : false,
+                orig: prevSourceMap !== undefined ? prevSourceMap : false,
                 root: options.sourceRoot
             });
             var outputOptions = mixIn({}, options.output, {

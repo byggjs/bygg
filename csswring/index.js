@@ -14,7 +14,7 @@ module.exports = function (options) {
             var opts = {
                 from: node.name,
                 map: {
-                    prev: prevSourceMap !== undefined ? prevSourceMap.data.toString('utf-8') : false,
+                    prev: prevSourceMap !== undefined ? prevSourceMap : false,
                     sourcesContent: true,
                     annotation: mixlib.tree.sourceMap.name(node)
                 }
