@@ -1,8 +1,6 @@
 'use strict';
 
-var mix = require('../lib');
-
-var SOURCEMAPPINGURL_PREFIX = '\n//# sourceMappingURL=';
+var mixlib = require('../lib');
 
 module.exports = function (from, to) {
     return function (tree) {
@@ -17,20 +15,12 @@ module.exports = function (from, to) {
                 return outputSibling;
             });
 
-            if (outputNode.metadata.mime === 'application/javascript') {
-                var source = outputNode.data.toString('utf8');
-                var sourceMapUrlStart = source.lastIndexOf(SOURCEMAPPINGURL_PREFIX);
-                if (sourceMapUrlStart !== -1) {
-                    var sourceMapUrlEnd = source.indexOf('\n', sourceMapUrlStart + SOURCEMAPPINGURL_PREFIX.length);
-                    if (sourceMapUrlEnd === -1) {
-                        sourceMapUrlEnd = source.length;
-                    }
-                    var sourceMapUrlComment = source.substring(sourceMapUrlStart, sourceMapUrlEnd);
-                    sourceMapUrlComment = sourceMapUrlComment.replace(from, to);
-                    source = source.substring(0, sourceMapUrlStart) + sourceMapUrlComment + source.substring(sourceMapUrlEnd);
-                    outputNode.data = new Buffer(source, 'utf8');
-                }
+            var sourceMap = mixlib.tree.sourceMap.get(outputNode);
+            if (sourceMap) {
+                mixlib.tree.sourceMap.set(outputNode, sourceMap, { annotate: true });
             }
+
+            mixlib.logger.log('rename', 'Renamed ' + node.name + ' to ' + outputNode.name);
 
             return outputNode;
         });
