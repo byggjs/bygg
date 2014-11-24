@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org:soundrop/mix.git"
+    "url": "https://bitbucket.org/soundrop/mix.git"
   },
   "dependencies": {
     "chalk": "^0.5.1",
