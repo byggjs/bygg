@@ -5,6 +5,8 @@
 var Liftoff = require('liftoff');
 var nomnom = require('nomnom');
 
+var logger = require('../lib/logger')
+
 var cli = new Liftoff({
     name: 'mix',
     moduleName: 'mix',
@@ -13,6 +15,11 @@ var cli = new Liftoff({
 });
 
 cli.launch({}, function (env) {
+    if (!env.configPath) {
+        logger.error('mix', 'No mixfile found');
+        process.exit(1);
+    }
     require(env.configPath);
+
     nomnom.nom();
 });
