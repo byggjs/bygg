@@ -6,6 +6,8 @@ var signal = require('./lib/signal');
 var tree = require('./lib/tree');
 
 var task = function (name, callback, options) {
+    options = options || [];
+
     var command = nomnom.command(name);
 
     options.forEach(function (option) {
