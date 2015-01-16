@@ -47,7 +47,7 @@ module.exports = function (dir) {
     }
 
     return function (tree) {
-        var signal = mixlib.signal();
+        var output = mixlib.signal();
 
         schedule(function (done) {
             rimraf(dir, function (error) {
@@ -64,7 +64,7 @@ module.exports = function (dir) {
                 });
                 stream.end();
                 stream.on('finish', function () {
-                    signal.push(tree);
+                    output.push(tree);
                     done();
                 });
                 stream.on('error', function (error) {
@@ -74,6 +74,6 @@ module.exports = function (dir) {
             });
         });
 
-        return signal;
+        return output;
     };
 };
