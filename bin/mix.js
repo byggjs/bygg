@@ -11,6 +11,7 @@ var cli = new Liftoff({
     name: 'mix',
     moduleName: 'mix',
     configName: 'mixfile',
+    processTitle: 'mix',
     extensions: { '.js': null }
 });
 
