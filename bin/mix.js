@@ -5,7 +5,7 @@
 var Liftoff = require('liftoff');
 var nomnom = require('nomnom');
 
-var logger = require('../lib/logger')
+var logger = require('../lib/logger');
 
 var cli = new Liftoff({
     name: 'mix',
