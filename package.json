@@ -12,9 +12,9 @@
     "url": "https://bitbucket.org/soundrop/mix.git"
   },
   "dependencies": {
-    "chalk": "^0.5.1",
-    "chokidar": "^0.12.6",
-    "convert-source-map": "^0.4.1",
+    "chalk": "^1.0.0",
+    "chokidar": "0.12.6",
+    "convert-source-map": "^1.0.0",
     "extend": "^2.0.0",
     "liftoff": "^2.0.0",
     "mime": "^1.2.11",
