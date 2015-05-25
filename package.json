@@ -1,7 +1,7 @@
 {
   "name": "bygg",
   "description": "Streaming build system",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Ole André Vadla Ravnås",
     "email": "oleavr@gmail.com",
