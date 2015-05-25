@@ -1,4 +1,4 @@
-# bygg
+# Bygg
 **Stop worrying about the build system and start coding**
 
 Ever feel like existing front-end build systems just get in your way? Say hello
@@ -12,7 +12,7 @@ you covered.
 
 ## Documentation
 
-Check out [the examples](https://github.com/oleavr/bygg-examples) to get
+Check out the [examples](https://github.com/oleavr/bygg-examples) to get
 started.
 
 ## Sample `byggfile.js`
