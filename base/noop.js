@@ -1,9 +1,9 @@
 'use strict';
 
-var mixlib = require('../lib');
+var bygglib = require('../lib');
 
 module.exports = function () {
     return function (tree) {
-        return mixlib.signal(tree);
+        return bygglib.signal(tree);
     };
 };

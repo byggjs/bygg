@@ -8,16 +8,16 @@ var nomnom = require('nomnom');
 var logger = require('../lib/logger');
 
 var cli = new Liftoff({
-    name: 'mix',
-    moduleName: 'mix',
-    configName: 'mixfile',
-    processTitle: 'mix',
+    name: 'bygg',
+    moduleName: 'bygg',
+    configName: 'byggfile',
+    processTitle: 'bygg',
     extensions: { '.js': null }
 });
 
 cli.launch({}, function (env) {
     if (!env.configPath) {
-        logger.error('mix', 'No mixfile found');
+        logger.error('bygg', 'No byggfile found');
         process.exit(1);
     }
     require(env.configPath);

@@ -1,9 +1,9 @@
 'use strict';
 
+var bygglib = require('../lib');
 var mime = require('mime');
 var path = require('path');
 var vfs = require('vinyl-fs');
-var mixlib = require('../lib');
 
 module.exports = function (options) {
     options = (typeof options === 'string') ? { src: options } : options;
@@ -11,8 +11,8 @@ module.exports = function (options) {
     var src = (typeof options.src === 'string') ? [options.src] : options.src;
     var base = options.base !== undefined ? path.resolve(options.base) : process.cwd();
 
-    var watcher = mixlib.watcher();
-    var signal = mixlib.signal();
+    var watcher = bygglib.watcher();
+    var signal = bygglib.signal();
 
     var nodeFromVinyl = function (file) {
         return {
@@ -39,7 +39,7 @@ module.exports = function (options) {
 
         stream.on('end', function () {
             watcher.watch(files.map(function (file) { return file.path; }));
-            signal.push(mixlib.tree(files.map(nodeFromVinyl)));
+            signal.push(bygglib.tree(files.map(nodeFromVinyl)));
         });
     };
 

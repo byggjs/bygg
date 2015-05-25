@@ -1,15 +1,15 @@
 {
-  "name": "mix",
+  "name": "bygg",
   "description": "Streaming build system",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "author": {
     "name": "Ole André Vadla Ravnås",
-    "email": "ole.andre.ravnas@soundrop.com",
-    "url": "http://www.soundrop.fm/"
+    "email": "oleavr@gmail.com",
+    "url": "http://www.frida.re/"
   },
   "repository": {
     "type": "git",
-    "url": "https://bitbucket.org/soundrop/mix.git"
+    "url": "git://github.com/oleavr/bygg.git"
   },
   "dependencies": {
     "chalk": "^1.0.0",
@@ -28,7 +28,7 @@
     "node": ">= 0.10"
   },
   "bin": {
-    "mix": "./bin/mix.js"
+    "bygg": "./bin/bygg.js"
   },
   "main": "index.js"
 }
