@@ -17,7 +17,7 @@ started.
 
 ## Sample `byggfile.js`
 
-This file is just a quick sample to give you a taste of what bygg does.
+This file is just a quick sample to give you a taste of what Bygg does.
 
 ```js
 /* global require, process */
