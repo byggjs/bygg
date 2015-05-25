@@ -1,5 +1,5 @@
 # Bygg
-**Taking the pain out of build systems**
+**Taking the pain out of front-end build systems**
 
 Ever feel like existing front-end build systems just get in your way? Say hello
 to *Bygg*. The basic primitive isn't a single file, but a tree of files, and you

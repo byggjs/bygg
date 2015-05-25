@@ -1,6 +1,6 @@
 {
   "name": "bygg",
-  "description": "Taking the pain out of build systems",
+  "description": "Taking the pain out of front-end build systems",
   "version": "1.0.5",
   "author": {
     "name": "Ole André Vadla Ravnås",
