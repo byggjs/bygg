@@ -20,9 +20,6 @@ started.
 This file is just a quick sample to give you a taste of what Bygg does.
 
 ```js
-/* global require, process */
-'use strict';
-
 var bygg = require('bygg');
 
 var autoprefixer = require('bygg-plugins/autoprefixer');
