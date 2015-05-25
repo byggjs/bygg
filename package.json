@@ -1,6 +1,6 @@
 {
   "name": "bygg",
-  "description": "Streaming build system",
+  "description": "Taking the pain out of build systems",
   "version": "1.0.2",
   "author": {
     "name": "Ole André Vadla Ravnås",
