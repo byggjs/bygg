@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "chalk": "^1.0.0",
-    "chokidar": "0.12.6",
+    "chokidar": "^1.0.0",
     "convert-source-map": "^1.0.0",
     "extend": "^2.0.0",
     "liftoff": "^2.0.0",
@@ -22,7 +22,7 @@
     "nomnom": "^1.8.1",
     "rimraf": "^2.2.8",
     "vinyl": "^0.4.5",
-    "vinyl-fs": "^0.3.13"
+    "vinyl-fs": "^1.0.0"
   },
   "engines": {
     "node": ">= 0.10"
