@@ -10,7 +10,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/oleavr/bygg.git"
+    "url": "git://github.com/byggjs/bygg.git"
   },
   "dependencies": {
     "chalk": "^1.0.0",
