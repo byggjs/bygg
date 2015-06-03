@@ -12,7 +12,7 @@ you covered.
 
 ## Documentation
 
-Check out the [examples](https://github.com/oleavr/bygg-examples) to get
+Check out the [examples](https://github.com/byggjs/bygg-examples) to get
 started.
 
 ## Sample `byggfile.js`
