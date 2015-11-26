@@ -16,14 +16,14 @@
     "chalk": "^1.0.0",
     "chokidar": "^1.0.0",
     "convert-source-map": "^1.0.0",
-    "extend": "^2.0.0",
+    "extend": "^3.0.0",
     "liftoff": "^2.0.0",
     "mime": "^1.2.11",
     "node-notifier": "^4.0.2",
     "nomnom": "^1.8.1",
     "rimraf": "^2.2.8",
-    "vinyl": "^0.4.5",
-    "vinyl-fs": "^1.0.0"
+    "vinyl": "^1.1.0",
+    "vinyl-fs": "^2.2.1"
   },
   "engines": {
     "node": ">= 0.10"

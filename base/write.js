@@ -57,12 +57,10 @@ module.exports = function (dir) {
                 }
 
                 var stream = vfs.dest(dir);
-                tree.nodes.map(nodeToVinyl).forEach(function (files) {
-                    files.forEach(function (file) {
-                        stream.write(file);
-                    });
-                });
-                stream.end();
+
+                // Workaround for https://github.com/gulpjs/vinyl-fs/issues/120
+                stream.on('data', function() {});
+
                 stream.on('finish', function () {
                     output.push(tree);
                     done();
@@ -71,6 +69,14 @@ module.exports = function (dir) {
                     bygglib.logger.error('write', error);
                     done();
                 });
+
+                tree.nodes.map(nodeToVinyl).forEach(function (files) {
+                    files.forEach(function (file) {
+                        stream.write(file);
+                    });
+                });
+
+                stream.end();
             });
         });
 
