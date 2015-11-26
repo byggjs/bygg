@@ -1,7 +1,7 @@
 {
   "name": "bygg",
   "description": "Taking the pain out of front-end build systems",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": {
     "name": "Ole André Vadla Ravnås",
     "email": "oleavr@gmail.com",
